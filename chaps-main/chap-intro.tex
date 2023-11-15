@@ -4,20 +4,20 @@
 When deciding how to determine optimal foot placement various sensing methods were considered, such as using a depth camera to view the environment,
 placing force sensors on the robots feet or measuring servo torque to determine when the feet were in contact with a surface. A previous paper by ...... used a depth
 camera by storing past snapshots to adjust the feet to the optimal height, it was decided that the primary sensing method for this thesis would also be a depth camera
-but instead of storing snapshots, a \ac{SDF} would be generated of the local environment. This would allow for more advanced methods of placement selection
+but instead of storing snapshots, a \ac{sdf} would be generated of the local environment. This would allow for more advanced methods of placement selection
 and preliminary collision checking for leg movements.
 
-The first step in realising this system was to construct a accurate simulation of the hexapod. The primary simulation packages that were considered are Gazebo, PyBullet and MuJoCo.
-Gazebo was a appealing choice due to the easy integration with ROS, however it was decided to use MuJoCo since it was found to have a far superior contact physics simulation.
+The first step in realising this system was to construct a accurate simulation of the hexapod. The primary simulation packages that were considered are Gazebo, PyBullet and \ac{mujoco}.
+Gazebo was a appealing choice due to the easy integration with ROS, however it was decided to use \ac{mujoco} since it was found to have a far superior contact physics simulation.
 
-Once the hexapod was adequately modelled in MuJoCo a tripod gait state machine, \ac{IK} system and control interface was implement, at this stage the hexapod was capable of walking
+Once the hexapod was adequately modelled in \ac{mujoco} a tripod gait state machine, \ac{ik} system and control interface was implement, at this stage the hexapod was capable of walking
 on flat terrain.
 
-Next the the system to generate the \ac{SDF} was implemented, this entailed sampling the depth camera, comparing cells in the \ac{SDF} against the depth buffer and finally calculating
-the closest distance value of each \ac{SDF} cell. Additionally a system to render the \ac{SDF} using ray marching was also implemented, this was required because \ac{SDF}s are otherwise 
+Next the the system to generate the \ac{sdf} was implemented, this entailed sampling the depth camera, comparing cells in the \ac{sdf} against the depth buffer and finally calculating
+the closest distance value of each \ac{sdf} cell. Additionally a system to render the \ac{sdf} using ray marching was also implemented, this was required because \ac{sdf}s are otherwise 
 difficult to visualise, more on this in chapter ....
 
-Once the \ac{SDF} was implemented it was possible to build the system responsible for foot placement this is discussed in detail in chapter .... , after which collision checking for the generated
+Once the \ac{sdf} was implemented it was possible to build the system responsible for foot placement this is discussed in detail in chapter .... , after which collision checking for the generated
 foot motion was implement, ensuring that the hexapod does not get stuck on pieces of terrain.
 
 With this the system was realise in simulation, next the system was implemented and tested on the physical robot, discussed in detail in chapter ....
