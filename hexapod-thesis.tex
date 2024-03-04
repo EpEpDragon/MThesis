@@ -53,6 +53,14 @@
     \renewcommand\bibfont{\small}
     \renewcommand\bibsection{\chapter{\bibname}}
 \usepackage[printonlyused,withpage]{acronym}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
     
 %==== Tables + Graphics + Color =====================================
 \usepackage{array}%............................... Extended table defs 
@@ -153,9 +161,10 @@
 \include{chaps-main/chap-literature}
 \include{chaps-main/chap-content-A}
 \include{chaps-main/chap-content-modelling}
-\include{chaps-main/chap-content-sdf}
+\include{chaps-main/chap-content-mapping}
 \include{chaps-main/chap-content-motion}
-\include{chaps-main/chap-content-physical-implementation}
+\include{chaps-main/chap-content-effector-placement}
+\include{chaps-main/chap-content-hardware}
 \include{chaps-main/chap-content-testing}
 
 \include{chaps-main/chap-conclusion}

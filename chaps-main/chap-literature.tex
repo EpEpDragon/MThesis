@@ -1,5 +1,33 @@
 \chapter{Literature review}
+This chapter will discuss previous work done regarding various elements of the project, this includes the overarching method of placing end effectors on
+uneven terrain, simulation environments used, localisation in 3D space, and so forth.
 
-\section{Discrete element method }
+\section{End Effector Placement Method}
 
-The Discrete Element Method (DEM) analysis \citep{Cundall-1979} uses spherical objects. \citet{Lin:1997} developed a DEM model for ellipsoids.
+Among other research focused on hexapods, many focus on topics such as obstacle avoidance, climbing surfaces, confined surfaces and cargo transportation.
+When focusing of terrain adaptation most often the use of sensors such as \ac{lidar}, torque, or touch are employed. Where usually the height of end effectors
+are adjusted to the height of the terrain \cite{coelho2021trends}.
+
+Some papers, such as \cite{homberger2017terrain} utilise stereoscopic vision, in addition to end effector height adjustment, also focus on surface material classifications based on which the virtual
+stiffness of the impedance controller is adjusted.
+
+The focus of this paper will be on end effector height and planar position adaptation through real time walkability classification of the environment. 
+While only utilising an \ac{rgbd} camera as sensor
+
+\section{Localisation and Mapping}
+
+This project requires a system that will localise the robot within its environment, as the primary sensor used is an \ac{rgbd} camera various visual \ac{slam} systems 
+were considered. ORB-SLAM 3, a optimisation-based, sparse map \ac{slam} system was chosen to be used. ORB-SLAM 3 maintains a sparse map, an atlas, of both active and
+dormant features. This atlas is used to localise in the sparse map \citep{macario2022comprehensive}.
+
+The implementation of a dense map to be used for end effector placement is discussed in \autoref{chap:mapping}.
+
+\section{Simulation Environment}
+
+The most popular physics simulators for robotics in recent times are Gazebo, \ac{mujoco} and CoppeliaSim (previously V-REP) \citep{Collins-2021}.
+Gazebo and CoppeliaSim both have easy to use \ac{gui} interfaces and easy integration with \ac{ros}. \ac{mujoco} on the other hand does not have
+a full \ac{gui} interface, only a simulation viewer, and does not have native \ac{ros} integration. Having said this \ac{mujoco} was found to be
+the most accurate and fastest simulator when considering the use case of robotics \citep{Erez-2015}.
+
+Considering that the only relevant downside to \ac{mujoco} is the lack of native \ac{ros} integration and the lack of a comprehensive \ac{gui},
+which seeing as \ac{mujoco} has good python bindings, could be seen as a advantage, \ac{mujoco} was chosen as the simulator.

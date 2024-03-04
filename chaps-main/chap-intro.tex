@@ -1,22 +1,22 @@
 \chapter{Introduction}
 
-\section{Background and Motivation}
+\section{Background}
 
 Starting from the big picture, gradually narrow focus down to this project and where this report fits in.
 Why this specific project/report is worthwhile.
 
 
-\section{Project Goal}
+\section{Research Goal}
 Broken down into sub objectives
 
 The objectives of the project (in some cases the objectives of the report). If necessary describe limitations to the scope.
 
 
 \section{Methodology}
-When deciding how to determine optimal foot placement various sensing methods were considered, such as using a depth camera to view the environment,
-placing force sensors on the robots feet or measuring servo torque to determine when the feet were in contact with a surface. A previous paper by ...... used a depth
-camera by storing past snapshots to adjust the feet to the optimal height, it was decided that the primary sensing method for this thesis would also be a depth camera
-but instead of storing snapshots, a \ac{sdf} would be generated of the local environment. This would allow for more advanced methods of placement selection
+When deciding how to determine optimal end effector placement various sensing methods were considered, such as using a \ac{rgbd} camera to view the environment,
+placing force sensors on the robots feet or measuring servo torque to determine when the feet were in contact with a surface. A previous paper by ...... used a \ac{rgbd} camera
+by storing past snapshots to adjust the feet to the optimal height, it was decided that the primary sensing method for this thesis would also be a \ac{rgbd} camera
+but instead of storing snapshots, a height map would be generated of the local environment. This would allow for more advanced methods of placement selection
 and preliminary collision checking for leg movements.
 
 The first step in realising this system was to construct a accurate simulation of the hexapod. The primary simulation packages that were considered are Gazebo, PyBullet and \ac{mujoco}.
@@ -25,13 +25,12 @@ Gazebo was a appealing choice due to the easy integration with ROS, however it w
 Once the hexapod was adequately modelled in \ac{mujoco} a tripod gait state machine, \ac{ik} system and control interface was implement, at this stage the hexapod was capable of walking
 on flat terrain.
 
-Next the the system to generate the \ac{sdf} was implemented, this entailed sampling the depth camera, comparing cells in the \ac{sdf} against the depth buffer and finally calculating
-the closest distance value of each \ac{sdf} cell. Additionally a system to render the \ac{sdf} using ray marching was also implemented, this was required because \ac{sdf}s are otherwise 
-difficult to visualise, more on this in chapter ....
+Next the the system to generate the height map was implemented, this entailed sampling the \ac{rgbd} camera and comparing cells in the height map against the depth buffer.
+Once the height map was implemented it was possible to build the system responsible for end effector placement, this is covered in detail in \autoref{chap:effector-placement},
+after which collision checking for the generated end effector motion was implement, ensuring that the hexapod does not get stuck on pieces of terrain.
 
-Once the \ac{sdf} was implemented it was possible to build the system responsible for foot placement this is discussed in detail in chapter .... , after which collision checking for the generated
-foot motion was implement, ensuring that the hexapod does not get stuck on pieces of terrain.
+With this the system was realise in simulation, next the system was implemented and tested on the physical robot, discussed in detail in \autoref{chap:hardware}
 
-With this the system was realise in simulation, next the system was implemented and tested on the physical robot, discussed in detail in chapter ....
+\section{Scope and Limitations}
 
 \section{Thesis Outline}
