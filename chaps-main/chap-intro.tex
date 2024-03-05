@@ -2,25 +2,38 @@
 
 \section{Background}
 
-Starting from the big picture, gradually narrow focus down to this project and where this report fits in.
-Why this specific project/report is worthwhile.
+There are many applications where vehicles are required to traverse rough terrain, such as in mines, rescue operations, agriculture, construction, etc. In many of these
+use cases rough terrain makes the use of wheeled, or even tracked, vehicles difficult or impractical.
+
+Compared to wheeled robots, legged robots could perform better in many of these environments, allowing navigation over terrain that would be impossible for wheeled or
+tracked vehicles to navigate. While legged robots possess extreme degrees of potential terrain traversability, advanced control and sensory systems are required to 
+realise this potential.
 
 
 \section{Research Goal}
-Broken down into sub objectives
+The overarching goal of this project is to design and implement a sensory and control system that will allow a hexapod robot to autonomously walk over rough terrain.
 
-The objectives of the project (in some cases the objectives of the report). If necessary describe limitations to the scope.
+This goal of the project is broken up into the following sub objectives:
+
+\begin{enumerate}
+    \item Obtain a mathematical model of the robot, its actuators and its sensors.
+    \item Create a model of the robot in a simulation environment for development and testing.
+    \item Implement a vision based \ac{slam} system.
+    \item Develop a real time vision based dense mapping system for use in anchor point selection.
+    \item Develop a optimisation system to select optimal end effector anchor points based on the surrounding terrain.
+    \item Implement tilt stabilisation feedback control.
+    \item Implement and test the entire system on the physical hexapod robot.
+\end{enumerate}
 
 
 \section{Methodology}
 When deciding how to determine optimal end effector placement various sensing methods were considered, such as using a \ac{rgbd} camera to view the environment,
-placing force sensors on the robots feet or measuring servo torque to determine when the feet were in contact with a surface. A previous paper by ...... used a \ac{rgbd} camera
-by storing past snapshots to adjust the feet to the optimal height, it was decided that the primary sensing method for this thesis would also be a \ac{rgbd} camera
-but instead of storing snapshots, a height map would be generated of the local environment. This would allow for more advanced methods of placement selection
-and preliminary collision checking for leg movements.
+placing force sensors on the robots end effectors or measuring servo torque to determine when the end effectors were in contact with a surface. A previous paper by \cite{erasmus2023guidance} used a \ac{rgbd} camera
+by storing past snapshots to adjust the end effectors to the optimal height, it was decided that the primary sensing method for this thesis would also be a \ac{rgbd} camera
+but instead of storing snapshots, a height map would be generated of the local environment. This would allow for more advanced methods of anchor point selection.
 
 The first step in realising this system was to construct a accurate simulation of the hexapod. The primary simulation packages that were considered are Gazebo, PyBullet and \ac{mujoco}.
-Gazebo was a appealing choice due to the easy integration with ROS, however it was decided to use \ac{mujoco} since it was found to have a far superior contact physics simulation.
+Gazebo was a appealing choice due to the easy integration with ROS, however it was decided to use \ac{mujoco} since it was found to have superior contact physics simulation \citep{Erez-2015}.
 
 Once the hexapod was adequately modelled in \ac{mujoco} a tripod gait state machine, \ac{ik} system and control interface was implement, at this stage the hexapod was capable of walking
 on flat terrain.
@@ -29,8 +42,42 @@ Next the the system to generate the height map was implemented, this entailed sa
 Once the height map was implemented it was possible to build the system responsible for end effector placement, this is covered in detail in \autoref{chap:effector-placement},
 after which collision checking for the generated end effector motion was implement, ensuring that the hexapod does not get stuck on pieces of terrain.
 
-With this the system was realise in simulation, next the system was implemented and tested on the physical robot, discussed in detail in \autoref{chap:hardware}
+With this the system was realised in simulation, next the system was implemented and tested on the physical robot, discussed in detail in \autoref{chap:hardware}
 
 \section{Scope and Limitations}
 
+As the hardware used was developed by \cite{erasmus2023guidance} this project will focus only on developing the necessary software to control het robot hardware.
+
+The velocity control, tilt angle stabilisation and end effector motion planner was developed by the author, while the low level \ac*{ik} controller used was developed
+by \citep{erasmus2023guidance}. The scope of this project does not include autonomous waypoint navigation and thus requires a human operator to provide desired velocity
+commands. If no solution can be found for the given velocity command the system will not attempt to adjust the velocity command, the human operator will be required to
+adjust the command.
+
+The local dense height map system was developed by the author, while the \ac{slam} system used, ORB-SLAM3 was developed by \cite{campos2021orb}.
+It should be noted however that ORB-SLAM3 does generate a global sparse feature map of the environment, thus implementing waypoint navigation should be a trivial addition.
+
+The sensors used in this project are limited to a single \ac{rgbd} camera, thus even with the generation of a local map, there could be cases where the system will not have
+height data around a desired anchor point. No torque or touch sensors are used to augment the system, thus if a leg were to collide with the terrain the robot will not adjust its trajectory.
+The system will however attempt to choose a step path  based on the local heigh tmap such that no collision occurs. Additionally no \ac{imu} is used, pose estimation
+is entirely handled by the \ac{slam} system.
+
 \section{Thesis Outline}
+
+Chapter 2 provides a literature review on the methods of control, sensing and simulation used for hexapod robots.
+
+Chapter 3 provides a overview of the hexapod hardware and the modelling thereof. This includes the robots mechanical form, sensors, on board computers and the simulation environment
+that is used.
+
+Chapter 4 describes the environment mapping systems used, this includes the local dense height map and the sparse \ac{slam} system.
+
+Chapter 5 covers motion related topics, this includes the walking gait, \ac{ik} and effector motion planning.
+
+Chapter 6 describes the optimisation function and its various scores used to acquire the optimal end effector anchor points during each step taken.
+
+Chapter 7 covers the hardware implementation process and software structure on the hardware.
+
+Chapter 8 describes the various tests preformed and results obtained thereof.
+
+Chapter 9 provides the conclusion of the research and any recommended future additions.
+
+
