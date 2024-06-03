@@ -1,13 +1,72 @@
-\chapter{End Effector Placement} \label{chap:effector-placement}
-A terrain scoring and optimisation function that executes on the height map is used to optimise the anchor points of the three supporting end effectors.
-This chapter covers the optimisation function and parameters used for this.
+\chapter{End Effector Anchor Point Adjustment} \label{chap:effector-placement}
+The best possible anchor points for the supporting feet, given an initial point from the walking
+gait state machine, must be found based on the heightmap. This is done by applying various
+scores to the heightmap and selecting a point with the best score within an allowable
+deviation from the initial point received from the gait state machine.
+
+The scores scores considered are the slope of the terrain and the proximity to other parts of the terrain with steep inclines,
+i.e. to reject points inside holes or close to ledges.
 
 
 \section{Scoring}
-    \subsection{Terrain Proximity}
-    \subsection{Slope}
-    \subsection{Height Delta}
+    \subsection{Gradient Score}
+        The gradient score is simply taken as the slope of the terrain at the current point. As the
+        heightmap slope is not defined by a known function, the gradient is calculated using the Sobel
+        operator (\cite{sobel2014}), a combination of a central finite difference and a smoothing operator, as described in equatinons \ref{eq:sobelgx}-\ref{eq:sobelsg}.
 
-\section{Placement Optimisation}
-    \subsection{Cost Function}
-    \subsection{Optimisation Function}
+        \begin{align}
+            \begin{split} \label{eq:sobelgx}
+                G_x(x,y) &=  \begin{bmatrix}
+                                +1 & 0 & -1\\
+                                +2 & 0 & -2\\
+                                +1 & 0 & -1
+                            \end{bmatrix}
+                            *\boldsymbol{h}_{i,j}
+            \end{split}\\
+            \begin{split} \label{eq:sobelgy}
+                G_y(x,y) &=  \begin{bmatrix}
+                                +1 & +2 & +1\\
+                                0 & 0 & 0\\
+                                -1 & -2 & -1
+                            \end{bmatrix}
+                            *\boldsymbol{h}_{i,j}
+            \end{split}\\
+            S_g(x,y) &= C_g\sqrt{G_x(x,y)^2 + G_y(x,y)^2} \label{eq:sobelsg}
+        \end{align}
+
+    \subsection{Terrain Proximity Score}
+    The proximity score aims to bias the selected anchor point away from points near steep inclines in the terrain. This score is defined as the average of the height
+    difference of the current point weighted by the gaussian kernel \(\boldsymbol{K}\).
+
+    \begin{equation}
+        S_p(x,y) = C_p\left|\frac{\sum\left[\boldsymbol{K}*(\boldsymbol{h}_{i,j}-\boldsymbol{h}_{x,y})\right]}{n^2}\right|
+    \end{equation}
+
+    \(x-\frac{1}{2}(n-1)<i<x+\frac{1}{2}(n-1)\) and \(y-\frac{1}{2}(n-1)<j<y+\frac{1}{2}(n-1)\)\\
+
+    Where \(x\) and \(y\) are the indices of the cell whose score is currently being evaluated, \(\boldsymbol{h}\) is the
+    heightmap, \(\boldsymbol{K}\) is the kernel of size n by n with n odd and \(C_p\) is the score's weighting constant.
+    A diagrammatic, sliced, representation of the proximity score can be seen in Figure \ref{fig:prox_score_diagram}. The
+    slice is taken along the x axis of the heightmap.
+
+    \subsection{Constraints}
+    It is important to constrain the possible anchor points to confer to the stability triangle,
+    meaning that the centre of mass of the robot must be inside the triangle formed by the three
+    anchor points. Additionally, it is important that the points selected are not too far away,
+    both in the horizontal and vertical direction for the robot to reach.
+
+
+\section{Method of adjustment}
+    Once the heightmap has been processed into the score map, which is done by adding the
+    slope score and terrain proximity score, the point with the best score must be found for every
+    initial anchor point.
+    The resolution of the heightmap is not very high and the adjusted anchor point is not
+    allowed to deviate too far from the initial anchor point, additionally due to the parallel nature
+    of the heightmap generation it is possible to score the entire heightmap with minimal cost.
+    Thus, it was decided to not employ an optimisation algorithm, such as gradient decent or
+    Bayesian, but rather to use a radial search algorithm. This algorithm progressively expands
+    its searching radius over the square score grid until a valid score is found, at which point it
+    terminates, thus ensuring that the closest valid point to the initial anchor point is selected.
+    See Figure \ref{fig:score_search} for a diagram representing the search pattern for a 5 grid squares search area.
+    Note that this search pattern will become inaccurate for large search areas, as the pattern steps
+    in a square manner. This however is not much of a concern for smaller search areas.
