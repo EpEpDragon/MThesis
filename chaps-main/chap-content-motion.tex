@@ -1,18 +1,127 @@
 \chapter{Motion}
 This chapter describes the systems governing the motion of the robot, such as leg motion planning and gait generation.
 \section{Gait State Machine}
-\section{\acf{ik}}
 
 \newpage
-\section{Foot Motion}
+\section{Kinematics}
+    When commanding a foot position, the servo controller requires a function to calculate servo angles. While the foot arc planner, see section 
+    \ref{sec:arc_generation}, requires the current position of the feet to function. The \ac{ik} and \ac{fk} functions described in this section provide
+    this functionality. Figure \ref{fig:kinematics} illustrates the leg geometry and variables used in the \ac{ik} and \ac{fk} functions.
+    \begin{figure}[h]
+        \centering
+        % \hspace{-1.38cm}
+        \includegraphics[clip, trim=0 0cm 0 1.51cm]{kinematics.drawio.pdf}
+        \caption{Leg Kinematics Diagram}
+        \label{fig:kinematics}
+    \end{figure}
 
-\begin{figure}[h]
-    \centering
-    \hspace{-1.38cm}
-    \includegraphics{figs/foot_path.pdf}
-    % \indent
-    \caption{End effector movement path}
-\end{figure}
+    \subsection{\acf{ik}}
+        The \ac{ik} function calculates the leg servo angles, \(\boldsymbol{\Theta} = [\Theta_1, \Theta_2, \Theta_3]^T_{\displaystyle ,}\) required
+        to move the foot to the given target position vector, \(\boldsymbol{p_t} = [x_t,y_t,z_t]^T_{\displaystyle .}\)
+        \hbox{Equation \ref{eq:ik}} describes the \ac{ik} function.
+        \begin{equation}\label{eq:ik}
+            \boldsymbol{\Theta} =
+                                \begin{bmatrix}
+                                    \Theta_1\\
+                                    \Theta_2\\
+                                    \Theta_3
+                                \end{bmatrix}
+                                =
+                                \begin{bmatrix}
+                                    \arctan{\left(\dfrac{x_t}{y_t}\right)}\\[0.5cm]
+                                    \dfrac{\pi}{4} - \alpha - \arctan{\left(\dfrac{y}{d-L_1}\right)}\\[0.5cm]
+                                    \dfrac{\pi}{2} - \beta
+                                \end{bmatrix}
+        \end{equation}
+        Where \(\alpha\), \(\beta\), \(c\) and \(d\) are calculate as shown in equations \ref{eq:alpha} to \ref{eq:dik}.
+        \begin{align}
+            \alpha &= \arcsin{\left(\frac{L_3\sin{\beta}}{c}\right)} \label{eq:alpha} \\
+            \beta &= \arccos{\left(\dfrac{L_1^2 + L_2^2 -c^2}{2L_1L_2}\right)}\\
+            c &= \sqrt{(d-L_1)^2+z_t^2}\\
+            d &= \sqrt{x_t^2 + y_t^2} \label{eq:dik}
+        \end{align}
+    \subsection{\acf{fk}}
+        The \ac{fk} function calculates the position vector of a foot, \(\boldsymbol{p_c} = [x_c,y_c,z_c]\),
+        given the current angles of the leg servos, \(\boldsymbol{\theta} = [\theta_1, \theta_2, \theta_3]\).
+        \begin{align}
+            \boldsymbol{p_c} =
+                            \begin{bmatrix}
+                                x_c\\
+                                y_c\\
+                                z_c
+                            \end{bmatrix}
+                            =
+                            \begin{bmatrix}
+                                d\cos{\theta_1}\\
+                                d\sin{\theta_1}\\
+                                L_2\sin{\theta_2} + L_3\sin{\left(\theta_2 + \theta_3\right)}
+                            \end{bmatrix}
+        \end{align}
+        Where \(d\) is calculated as shown in in equation \ref{eq:dfk}.
+        \begin{equation}\label{eq:dfk}
+            d = L1 + L_2\sin{\theta_2} + L_3\sin{(\theta_2 + \theta_3)}
+        \end{equation}
+
+\newpage
+\section{Foot Arc Generation} \label{sec:arc_generation}
+    When taking a step the foot can not simply be moved to its destination in a straight line, as doing so will cause the foot to be dragged on the terrain,
+    impeding the movement of the robot. Thus it is required to move the foot in an arc like motion to clear any obstacles that might be in its path.
+
+    \subsection{Existing System}
+        The existing system will at the start of each step compute an arc at the start of each step the robot takes, this arc is then sent to the servo controller
+        to be executed. While efficient and effective in ideal conditions, this method of defining the arc has poor performance when considering external
+        influences. If for example the robot has to adjust the final target of its feet mid step, this arc would have to be recomputed in its entirety,
+        thus leading to possible performance concerns.
+
+        In addition to this Text, the current system is designed with the assumption that the starting position of the foot is grounded, thus if the arc is recomputed
+        mid step the arc will be undesirable, as it will rise with the desired step height for a second time. This is illustrated in Figure \ref{fig:old_arc}.
+
+        \begin{figure}[h]
+            \centering
+            \hspace{-1.38cm}
+            \includegraphics{old_path.pdf}
+            \caption{Existing arc recomputation problem}
+            \label{fig:old_arc}
+        \end{figure}
+
+    \subsection{Improved System}
+        The improved system solves this problem by utilising a flow function. During a step, this function will continuously calculate the
+        direction that the foot must move to reach its destination. Thus this system is resilient to external disturbances and is capable of adjusting to
+        varying destination and step height requirements. 
+        
+        The flow field is designed to first move the foot vertically upwards until horizontal coplanar with the destination, and then to follow a
+        arc to the destination with a defined step height, this can be adjusted to make the arc start before or after coplanar. The step height can be adjusted at any point in time and the flow field will adjust accordingly.
+        Figure \ref{fig:foot_arc} illustrates the field function and is described in section \ref{sec:flow_function}.
+        \begin{figure}[h]
+            \centering
+            \hspace{-1.38cm}
+            \includegraphics{foot_path.pdf}
+            \caption{End effector movement path}
+            \label{fig:foot_arc}
+        \end{figure}
+
+        \subsubsection{Flow Function Description} \label{sec:flow_function}
+            The flow function, \(\omega(x,y)\), uses the gradient function of a parabola passing through the point \([0,0]\) and \([x,y]\) as a basis, where point \([x,y]\)
+            is the current point that is being evaluated and \(x\) is the horizontal distance between the destination and the current point and \(y\) the
+            vertical distance. The final function is described by equations \ref{eq:omega} to \ref{eq:sigmoid}, for the process of designing the flow function
+            please see appendix \ref{app:flow_function}.
+            \begin{equation} \label{eq:omega}
+                \begin{aligned}{2}
+                \omega(x,y) &= \frac{\delta}{\delta x\delta y}&&f_a(x,y)x^2 + f_b(x,y)x + C\\
+                    &= &&2f_a'(x,y) + f_b'(x,y)    
+                \end{aligned}
+            \end{equation}
+            Where \(f_a'(x,y)\) and \(f_b'(x,y)\) are defined as follows:
+            \begin{align} \label{eq:fa}
+                f_a'(x,y) &= -\left|\frac{v_h}{x}\right| - \left|S(y)\right|\\
+                f_b'(x,y) &= \frac{y}{x} - f_a(x,y)
+            \end{align}
+            Where \(v_h\) is the variable describing the step height and \(S(y)\) is a sigmoid like function defined in Equation \ref{eq:sigmoid}.
+            \begin{equation} \label{eq:sigmoid}
+                S(y) = \frac{0.6(y-q)}{1+\left|y-q\right|-0.59}
+            \end{equation}
+            Where \(q\) is the variable that determines at which vertical displacement the leg path transitions from primarily an vertical motion to
+            an arc motion.
 
 
 
