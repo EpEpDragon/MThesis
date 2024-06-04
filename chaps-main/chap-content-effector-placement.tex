@@ -4,11 +4,9 @@ gait state machine, must be found based on the heightmap. This is done by applyi
 scores to the heightmap and selecting a point with the best score within an allowable
 deviation from the initial point received from the gait state machine.
 
-The scores scores considered are the slope of the terrain and the proximity to other parts of the terrain with steep inclines,
-i.e. to reject points inside holes or close to ledges.
-
-
 \section{Scoring}
+    The scores considered are the gradient and proximity scores. The gradient score aims to reject points with high gradients while the proximity score rejects points close
+    to other parts of the terrain with steep inclines, i.e. to reject points inside holes or close to ledges.
     \subsection{Gradient Score}
         The gradient score is simply taken as the slope of the terrain at the current point. The aim of this score is to prevent the robot from slipping due to
         selecting anchor points with too steep of a gradient.
