@@ -1,6 +1,109 @@
 \chapter{Motion}
-This chapter describes the systems governing the motion of the robot, such as leg motion planning and gait generation.
+% This chapter describes the systems governing the motion of the robot, such as leg motion planning and gait generation.
+The basic operation of the motion system is as follows, first the robot is commanded to walk in a certain direction, at a
+certain speed and body height. These commands are sent from the base station to Jetson Nano on the robot,
+the motion controller node on the Jetson Nano then sends these commands to the gait state machine node, at a fixed frequency.
+The gait state machine uses the received direction stride length to generate leg states (swinging or supporting) and the ideal
+final position of each foot. These states and positions are sent back to the motion controller node where the positions are adjusted
+based on the heightmap data to ensure stable footing. The leg states and adjusted feet positions are then sent to the servo 
+controller node, this node controls the servos to move the robots feet to their final positions, either in a arc or linearly,
+depending on their state (swinging or supporting). %A high level diagram of the motion system can be seen in \ref{fig:motion_system}.
+
+\begin{figure}[h]
+    \centering
+    % \hspace{-1.38cm}
+    \includegraphics{Diagrams-MotionSystem.drawio.pdf}
+    \caption{Motion System Overview}
+    \label{fig:motion_system}
+\end{figure}
+
 \section{Gait State Machine}
+The state machine used to realise the tripod gait used in the robot is quite simple, comprised of only two states, stepping and
+resting, as can be seen from figure \ref{fig:gaitSM}. Table \ref{tab:state_defs} defines the actions that should be taken during
+each state.
+
+The primary computation done by this state machine is calculating which legs are supporting and which are swinging, which occurs
+on entering the "Stepping" state. This function is described in section \ref{sec:supp_swing_calc}.
+
+\begin{figure}[h]
+    \centering
+    % \hspace{-1.38cm}
+    \includegraphics{Diagrams-GaitSM.drawio.pdf}
+    \caption{Gait State Machine}
+    \label{fig:gaitSM}
+\end{figure}
+
+\begin{table}[h]
+    \center
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline
+        \multicolumn{2}{|c|}{Rest State Definition} \\
+        \hline
+        Enter Condition & Is the current step finished? \\
+        \hline
+        On Entering & Set all leg states as supporting. \\
+        \hline
+        While Active & Do nothing \\
+        \hline
+    \end{tabularx}
+    
+    \bigskip
+    \noindent
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline
+        \multicolumn{2}{|c|}{Stepping State Definition} \\
+        \hline
+        Enter Condition & Is there a mismatch between feet targets and current position? \\
+        \hline
+        On Entering & Calculate and set the leg states based on walking direction. \\
+        \hline
+        While Active & Adjust feet targets based on direction, stride length and robot height\\
+        \hline
+    \end{tabularx}
+    \caption{State Definitions}
+    \label{tab:state_defs}
+\end{table}
+
+\newpage
+\subsection{Choosing The Supporting And Swinging Legs} \label{sec:supp_swing_calc}
+    The robot body is divided up into sextants, centered around the nominal leg positions. When calculating
+    the swinging legs it is first determined in which sextant the movement direction vector falls, this is called the active sextant.
+    The leg related with the active sextant, and the two opposite, are then chosen as swinging, with the remaining three legs chosen as supporting.
+
+    The swinging legs are defined by the boolean array, \(\boldsymbol{S_i}\), as described in equation \ref{eq:is_swing}.
+    \begin{equation}\label{eq:is_swing}
+        \begin{gathered}
+            \boldsymbol{S}_{\boldsymbol{i} - \xi} \iff i \text{ is even} \\
+            \boldsymbol{S}_{\boldsymbol{i} - \xi}={i|(i-\xi) \text{ is even}} \\
+            \text{Where \(i \in [0,5]\) and \(\xi\) is the active sextant/leg number.}
+        \end{gathered}
+    \end{equation}
+
+    \noindent
+    Figure \ref{fig:sextants} illustrates and example with sextant 2 being active. Thus legs 2, 4 and 6 are swinging, while legs 1,3 and 5 are supporting.
+    \begin{figure}[h]
+        \centering
+        \hspace{1.1cm}
+        \includegraphics{Diagrams-Sextants.drawio.pdf}
+        \caption{Leg sextants, with sextant 2 being active.} 
+        \label{fig:sextants}
+    \end{figure}
+
+    This of course would not be sufficient to define a walking gait, as at the end of each step \(\boldsymbol{S_i}\) does not invert.
+    Thus and additional step after equation \ref{eq:is_swing} is added. The current horizontal length of leg \(\xi\), defined as \(l_\xi\), is compared to its nominal
+    horizontal length, \(L_\xi\). If \(l_\xi\ > L_\xi\), invert \(\xi\). As shown in equation \ref{eq:negate_is_swing}.
+
+    \begin{equation} \label{eq:negate_is_swing}
+        \begin{gathered}
+            l_\xi\ > L_\xi \longrightarrow \boldsymbol{S_i} \Longleftarrow  \lnot \boldsymbol{S_i} \\
+            \boldsymbol{S}_{\boldsymbol{i} - \xi} =
+                                                \begin{cases}
+                                                    \boldsymbol{i} \setminus \boldsymbol{S}_{\boldsymbol{i} - \xi} & l_\xi > L_\xi \\
+                                                    \boldsymbol{S}_{\boldsymbol{i} - \xi} & l_\xi \leq L_\xi
+                                                \end{cases}\\
+            \text{Where \(i \in [0,5]\) and \(\xi\) is the active sextant/leg number.}
+        \end{gathered}
+    \end{equation}
 
 \newpage
 \section{Kinematics}
@@ -61,14 +164,35 @@ This chapter describes the systems governing the motion of the robot, such as le
         \begin{equation}\label{eq:dfk}
             d = L1 + L_2\sin{\theta_2} + L_3\sin{(\theta_2 + \theta_3)}
         \end{equation}
+    
+    \subsection{Angular Rate}
+    To move a foot on a desired path it is important to not only know the absolute angle of the three leg servos, but also the angular rates of all three
+    servos. If the servos are all moved at the same rate, the shape of the path that the foot follows will not be linear, but rather dependant on the
+    current foot position. This is undesirable, thus equations \ref{eq:rate} define the derivative of the \ac{ik} equations (\ref{eq:ik}), i.e. the angular
+    rate.
+
+    \begin{equation}\label{eq:rate}
+        \boldsymbol{\omega} =
+                            \begin{bmatrix}
+                                \omega_1\\
+                                \omega_2\\
+                                \omega_3
+                            \end{bmatrix}
+                            =
+                            \begin{bmatrix}
+                                \displaystyle \frac{- x\dot{y} + y \dot{x}}{x^2 + y^2}\\[0.5cm]
+                                \dfrac{\pi}{4} - \alpha' - \arctan{\left(\dfrac{y}{d-L_1}\right)}\\[0.5cm]
+                                \dfrac{\pi}{2} - \beta'
+                            \end{bmatrix}
+    \end{equation}
 
 \newpage
-\section{Foot Arc Generation} \label{sec:arc_generation}
+\section{Foot Motion} \label{sec:arc_generation}
     When taking a step the foot can not simply be moved to its destination in a straight line, as doing so will cause the foot to be dragged on the terrain,
     impeding the movement of the robot. Thus it is required to move the foot in an arc like motion to clear any obstacles that might be in its path.
 
     \subsection{Existing System}
-        The existing system will at the start of each step compute an arc at the start of each step the robot takes, this arc is then sent to the servo controller
+        The existing system will, at the start of each step, compute an arc for each foot to follow, this arc is then sent to the servo controller
         to be executed. While efficient and effective in ideal conditions, this method of defining the arc has poor performance when considering external
         influences. If for example the robot has to adjust the final target of its feet mid step, this arc would have to be recomputed in its entirety,
         thus leading to possible performance concerns.
@@ -101,13 +225,13 @@ This chapter describes the systems governing the motion of the robot, such as le
         \end{figure}
 
         \subsubsection{Flow Function Description} \label{sec:flow_function}
-            The flow function, \(\omega(x,y)\), uses the gradient function of a parabola passing through the point \([0,0]\) and \([x,y]\) as a basis, where point \([x,y]\)
+            The flow function, \(\rho(x,y)\), uses the gradient function of a parabola passing through the point \([0,0]\) and \([x,y]\) as a basis, where point \([x,y]\)
             is the current point that is being evaluated and \(x\) is the horizontal distance between the destination and the current point and \(y\) the
-            vertical distance. The final function is described by equations \ref{eq:omega} to \ref{eq:sigmoid}, for the process of designing the flow function
+            vertical distance. The final function is described by equations \ref{eq:rho} to \ref{eq:sigmoid}, for the process of designing the flow function
             please see appendix \ref{app:flow_function}.
-            \begin{equation} \label{eq:omega}
-                \begin{aligned}{2}
-                \omega(x,y) &= \frac{\delta}{\delta x\delta y}&&f_a(x,y)x^2 + f_b(x,y)x + C\\
+            \begin{equation} \label{eq:rho}
+                \begin{aligned}
+                    \rho(x,y) &= \frac{\delta}{\delta x\delta y}&&f_a(x,y)x^2 + f_b(x,y)x + C\\
                     &= &&2f_a'(x,y) + f_b'(x,y)    
                 \end{aligned}
             \end{equation}
