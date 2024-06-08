@@ -84,7 +84,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
     \begin{figure}[h]
         \centering
         \hspace{1.1cm}
-        \includegraphics{Diagrams-Sextants.drawio.pdf}
+        \includegraphics[clip, trim=0 0.25cm 0 0.25cm]{Diagrams-Sextants.drawio.pdf}
         \caption{Leg sextants, with sextant 2 being active.} 
         \label{fig:sextants}
     \end{figure}
@@ -113,7 +113,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
     \begin{figure}[h]
         \centering
         % \hspace{-1.38cm}
-        \includegraphics[clip, trim=0 0cm 0 1.51cm]{kinematics.drawio.pdf}
+        \includegraphics[clip, trim=0 0.25cm 0 1.51cm]{kinematics.drawio.pdf}
         \caption{Leg Kinematics Diagram}
         \label{fig:kinematics}
     \end{figure}
@@ -123,7 +123,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
         to move the foot to the given target position vector, \(\boldsymbol{p_t} = [x_t,y_t,z_t]^T_{\displaystyle .}\)
         \hbox{Equation \ref{eq:ik}} describes the \ac{ik} function.
         \begin{equation}\label{eq:ik}
-            \boldsymbol{\Theta} =
+            \boldsymbol{\Theta}(x_t,y_t,z_t) =
                                 \begin{bmatrix}
                                     \Theta_1\\
                                     \Theta_2\\
@@ -132,7 +132,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
                                 =
                                 \begin{bmatrix}
                                     \arctan{\left(\dfrac{x_t}{y_t}\right)}\\[0.5cm]
-                                    \dfrac{\pi}{4} - \alpha - \arctan{\left(\dfrac{y}{d-L_1}\right)}\\[0.5cm]
+                                    \dfrac{\pi}{4} - \alpha - \arctan{\left(\dfrac{y_t}{d-L_1}\right)}\\[0.5cm]
                                     \dfrac{\pi}{2} - \beta
                                 \end{bmatrix}
         \end{equation}
@@ -147,7 +147,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
         The \ac{fk} function calculates the position vector of a foot, \(\boldsymbol{p_c} = [x_c,y_c,z_c]\),
         given the current angles of the leg servos, \(\boldsymbol{\theta} = [\theta_1, \theta_2, \theta_3]\).
         \begin{align}
-            \boldsymbol{p_c} =
+            \boldsymbol{p_c}(\theta_1,\theta_2,\theta_3) =
                             \begin{bmatrix}
                                 x_c\\
                                 y_c\\
@@ -169,10 +169,10 @@ on entering the "Stepping" state. This function is described in section \ref{sec
     To move a foot on a desired path it is important to not only know the absolute angle of the three leg servos, but also the angular rates of all three
     servos. If the servos are all moved at the same rate, the shape of the path that the foot follows will not be linear, but rather dependant on the
     current foot position. This is undesirable, thus equations \ref{eq:rate} define the derivative of the \ac{ik} equations (\ref{eq:ik}), i.e. the angular
-    rate.
+    rate, given the target movement speeds of a foot, \(\dot{x}\), \(\dot{y}\) and \(\dot{z}\).
 
     \begin{equation}\label{eq:rate}
-        \boldsymbol{\omega} =
+        \boldsymbol{\omega}(\dot{x}, \dot{y}, \dot{z}) =
                             \begin{bmatrix}
                                 \omega_1\\
                                 \omega_2\\
@@ -181,10 +181,12 @@ on entering the "Stepping" state. This function is described in section \ref{sec
                             =
                             \begin{bmatrix}
                                 \displaystyle \frac{- x\dot{y} + y \dot{x}}{x^2 + y^2}\\[0.5cm]
-                                \dfrac{\pi}{4} - \alpha' - \arctan{\left(\dfrac{y}{d-L_1}\right)}\\[0.5cm]
-                                \dfrac{\pi}{2} - \beta'
+                                \displaystyle \frac{\left[(L_1 - d)\dot{z} + z\dot{d}\right]\alpha + \Big[(L_1 - d)^2 + z^2\Big]\arctan{\left(\displaystyle\frac{L_1-d}{z}\right)}\dot{\alpha}}{(L_1 - d)^2 + z^2}\\[0.8cm]
+                                -\dot{\beta} 
                             \end{bmatrix}
     \end{equation}
+
+    With \(\dot\beta\), \(\dot\alpha\) and \(\dot{d}\) defined as shown in equation \ref{}.
 
 \newpage
 \section{Foot Motion} \label{sec:arc_generation}
@@ -203,7 +205,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
         \begin{figure}[h]
             \centering
             \hspace{-1.38cm}
-            \includegraphics{old_path.pdf}
+            \includegraphics[clip, trim=0 0.25cm 0 0.25cm]{old_path.pdf}
             \caption{Existing arc recomputation problem}
             \label{fig:old_arc}
         \end{figure}
@@ -219,7 +221,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
         \begin{figure}[h]
             \centering
             \hspace{-1.38cm}
-            \includegraphics{foot_path.pdf}
+            \includegraphics[clip, trim=0 0.25cm 0 0.25cm]{foot_path.pdf}
             \caption{End effector movement path}
             \label{fig:foot_arc}
         \end{figure}
@@ -232,7 +234,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
             \begin{equation} \label{eq:rho}
                 \begin{aligned}
                     \rho(x,y) &= \frac{\delta}{\delta x\delta y}&&f_a(x,y)x^2 + f_b(x,y)x + C\\
-                    &= &&2f_a'(x,y) + f_b'(x,y)    
+                    &= &&2f_a'(x,y)x + f_b'(x,y)    
                 \end{aligned}
             \end{equation}
             Where \(f_a'(x,y)\) and \(f_b'(x,y)\) are defined as follows:
@@ -240,12 +242,23 @@ on entering the "Stepping" state. This function is described in section \ref{sec
                 f_a'(x,y) &= -\left|\frac{v_h}{x}\right| - \left|S(y)\right|\\
                 f_b'(x,y) &= \frac{y}{x} - f_a(x,y)
             \end{align}
-            Where \(v_h\) is the variable describing the step height and \(S(y)\) is a sigmoid like function defined in Equation \ref{eq:sigmoid}.
+            Where \(v_h\) is the variable describing the step height and \(S(y)\) is a sigmoid like function 
+            responsible for the initial vertical rise. It is defined in Equation \ref{eq:sigmoid}.
             \begin{equation} \label{eq:sigmoid}
-                S(y) = \frac{0.6(y-q)}{1+\left|y-q\right|-0.59}
+                S(y) = \frac{0.515(y-q)}{1+\left|y-q\right|-0.505}
             \end{equation}
             Where \(q\) is the variable that determines at which vertical displacement the leg path transitions from primarily an vertical motion to
-            an arc motion.
+            an arc motion. Figure \ref{fig:sigmoid_like} illustrates the sigmoid like function for different values of \(q\).
+            \begin{figure}[h]
+                \centering
+                \hspace{-1.38cm}
+                \includegraphics[clip, trim=0 0.25cm 0 0.25cm]{sigmoid_like.pdf}
+                \caption{Sigmoid Like}
+                \label{fig:sigmoid_like}
+            \end{figure}
+
+            \noindent
+            Note that the 0.515 and 0.505 values in equation \ref{eq:sigmoid} are set to make its output range from roughly -1 to 0 over the active range.
 
 
 
