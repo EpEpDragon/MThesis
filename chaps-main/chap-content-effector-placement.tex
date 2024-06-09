@@ -14,35 +14,50 @@ deviation from the initial point received from the gait state machine.
         As the heightmap slope is not defined by a known function, the gradient is calculated using the Sobel
         operator (\cite{sobel2014}), a combination of a central finite difference and a smoothing operator.
         
-        Equation \ref{eq:sobelgx} and \ref{eq:sobelgy} describe the two separable x and y direction kernels, \(G_x\) and \(G_y\). These kernels are a combination of
-        central finite difference and smoothing operator, see Appendix \ref{app:sobel} for a breakdown. Equation \ref{eq:sobelsg} combines \(G_x\) and \(G_y\)
-        to produce the gradient score, \(S_g\).
-
+        \newpage
+        \noindent
+        Equation \ref{eq:sobelgx} and \ref{eq:sobelgy} describe the two separable x and y direction kernels, \(G_x\) and \(G_y\),
+        of the Sobel operator. These kernels are a combination of central finite difference and smoothing operator, see Appendix \ref{app:sobel} 
+        for a breakdown. Equation \ref{eq:sobelsg} combines \(G_x\) and \(G_y\) to produce the gradient score, \(S_g\). Note that these equations represent
+        a single scalar result of the Sobel operator using the frobenius inner product, \cite{horn2012matrix}. If evaluated over the whole height image this is equivalent
+        to convolution.
         \begin{align}
             \begin{split} \label{eq:sobelgx}
-                G_x(x,y) &=  \begin{bmatrix}
-                                +1 & 0 & -1\\
-                                +2 & 0 & -2\\
-                                +1 & 0 & -1
-                            \end{bmatrix}
-                            *\boldsymbol{h}_{i,j}
-            \end{split}\\
+                G_x(x,y) &= 
+                        \sbox0{$
+                        \begin{bmatrix}
+                            +1 & 0 & -1\\
+                            +2 & 0 & -2\\
+                            +1 & 0 & -1
+                        \end{bmatrix}
+                        ,\boldsymbol{h}_{i,j}
+                        $}
+                        \mathopen{\resizebox{1.2\width}{1.1\ht0}{$\Bigg\langle$}}
+                        \raisebox{0.08\ht0}{\usebox{0}}
+                        \mathclose{\resizebox{1.2\width}{1.1\ht0}{$\Bigg\rangle$}}_{\mkern-10mu F}
+            \end{split}\\[0.3cm]
             \begin{split} \label{eq:sobelgy}
-                G_y(x,y) &=  \begin{bmatrix}
-                                +1 & +2 & +1\\
-                                0 & 0 & 0\\
-                                -1 & -2 & -1
-                            \end{bmatrix}
-                            *\boldsymbol{h}_{i,j}
-            \end{split}\\
+                G_y(x,y) &= 
+                        \sbox0{$
+                        \begin{bmatrix}
+                            +1 & +2 & +1\\
+                            0 & 0 & 0\\
+                            -1 & -2 & -1
+                        \end{bmatrix}
+                        ,\boldsymbol{h}_{i,j}
+                        $}
+                        \mathopen{\resizebox{1.2\width}{1.1\ht0}{$\Bigg\langle$}}
+                        \raisebox{0.08\ht0}{\usebox{0}}
+                        \mathclose{\resizebox{1.2\width}{1.1\ht0}{$\Bigg\rangle$}}_{\mkern-10mu F}
+            \end{split}\\[0.3cm]
             S_g(x,y) &= C_g\sqrt{G_x(x,y)^2 + G_y(x,y)^2} \label{eq:sobelsg}
         \end{align}
-
         \begin{center}
-            Where \(C_g\) is the weighting constant associated with the gradient score, \(S_g\).
-
-            The \(*\) operator indicates the dot product.
+            Where \(i = \big[\mkern-4.7mu\big[x-1,\mkern2mu x+1\big]\mkern-4.7mu\big]\) and \(i = \big[\mkern-4.7mu\big[y-1,\mkern2mu y+1\big]\mkern-4.7mu\big]\)
         \end{center}
+        \noindent
+        With \(C_g\) being the weighting constant associated with the gradient score, \(S_g\).
+        
 
     \subsection{Terrain Proximity Score}
     The proximity score aims to bias the selected anchor point away from points near steep inclines in the terrain. This score is defined as the average of the height
@@ -51,20 +66,18 @@ deviation from the initial point received from the gait state machine.
     \ref{eq:terrain_prox}.
 
     \begin{equation} \label{eq:terrain_prox}
-        S_p(x,y) = C_p\left|\frac{\sum\left[\boldsymbol{K}*(\boldsymbol{h}_{i,j}-\boldsymbol{h}_{x,y})\right]}{n^2}\right|
+        S_p(x,y) = C_p\left|\frac{\sum\left\langle\boldsymbol{K},(\boldsymbol{h}_{i,j}-\boldsymbol{h}_{x,y})\right\rangle _{\mkern-3mu F}}{n^2}\right|
     \end{equation}
 
     \begin{center}
-        \(x-\frac{1}{2}(n-1)<i<x+\frac{1}{2}(n-1)\) and \(y-\frac{1}{2}(n-1)<j<y+\frac{1}{2}(n-1)\)
-
-        \vspace{0.2cm}
-        Where \(x\) and \(y\) are the indices of the cell whose score is currently being evaluated, \(\boldsymbol{h}\) is the
-        heightmap and \(C_p\) is the score's weighting constant.
-
-        The \(*\) operator indicates the dot product.
+        Where \(i = \big[\mkern-4.7mu\big[x- \lfloor\frac{1}{2}n\rfloor,\mkern2mu x+\lfloor\frac{1}{2}n\rfloor\big]\mkern-4.7mu\big]\) 
+        and \(i = \big[\mkern-4.7mu\big[y-\rfloor (n-1),\mkern2mu y+\rfloor (n-1)\big]\mkern-4.7mu\big]\)
     \end{center}
     
     \noindent
+    With \(x\) and \(y\) being the indices of the cell whose score is currently being evaluated, \(\boldsymbol{h}\) the
+    heightmap and \(C_p\) the score's weighting constant.
+    
     A diagrammatic, sliced, representation of the proximity score can be seen in Figure \ref{fig:prox_score_diagram}. The
     slice is taken along the x axis of the heightmap.
 

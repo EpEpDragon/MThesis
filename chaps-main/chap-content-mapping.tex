@@ -1,6 +1,12 @@
 \chapter{Mapping} \label{chap:mapping}
-In this chapter the localisation and mapping systems will be covered.
+For accurate foot placement and localisation purposes the robot makes use of two maps, a sparse map covering a large area, and a dense map covering a small
+area around the robot. The primarily use of the sparse map is for localisation and extracting pose data, i.e. orientation, velocity and rate. While the dense
+map is used to analyse the terrain and find an appropriate point to place the three supporting feet.
+It is possible to also use the sparse map for autonomous navigation, however this use case in not covered in this paper.
+This chapter covers the design of the mapping system.
 
-\section{Localisation and sparse map}
+\section{Localisation And Sparse Map}
+    The localisation, sparse mapping and pose estimation is handle by ORB-SLAM3 as described in \cite{campos2021orb}. Since ORB-SLAM3 is not a system designed by the author, its
+    design will not be covered in this chapter. Implementation and operation details will however be covered in chapters \ref{chap:hardware} and \ref{chap:results}.
 
-\section{Dense map}
+\section{Dense Map}
