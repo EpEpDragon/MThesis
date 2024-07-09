@@ -76,7 +76,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
             \boldsymbol{S}_{\boldsymbol{i} - \xi} \iff i \text{ is even} \\
             \boldsymbol{S}_{\boldsymbol{i} - \xi}=i|2 \\
             \boldsymbol{S}_{\boldsymbol{i} - \xi}=[i \text{ is even}] \\[0.1cm]
-            \text{Where \(i = [\![0,5]\!]\) and \(\xi \in i\) is the active sextant/leg number.}
+            \text{Where \(i = [\![0..5]\!]\) and \(\xi \in i\) is the active sextant/leg number.}
         \end{gathered}
     \end{equation}
 
@@ -249,17 +249,17 @@ on entering the "Stepping" state. This function is described in section \ref{sec
                     &= &&2f_a'(x,y)x + f_b'(x,y)    
                 \end{aligned}
             \end{equation}
-            Where \(f_a'(x,y)\) and \(f_b'(x,y)\) are defined as follows:
+            where, %\(f_a'(x,y)\) and \(f_b'(x,y)\) are defined as follows:
             \begin{align} \label{eq:fa}
                 f_a'(x,y) &= -\left|\frac{v_h}{x}\right| - \left|S(y)\right|\\
                 f_b'(x,y) &= \frac{y}{x} - f_a(x,y)
             \end{align}
-            Where \(v_h\) is the variable describing the step height and \(S(y)\) is a sigmoid like function 
-            responsible for the initial vertical rise. It is defined in Equation \ref{eq:sigmoid}.
+            with \(v_h\) being the variable describing the step height and \(S(y)\) being a sigmoid like function 
+            responsible for the initial vertical rise. \(S(y)\) is defined in Equation \ref{eq:sigmoid}.
             \begin{equation} \label{eq:sigmoid}
                 S(y) = \frac{0.515(y-q)}{1+\left|y-q\right|-0.505}
             \end{equation}
-            Where \(q\) is the variable that determines at which vertical displacement the leg path transitions from primarily an vertical motion to
+            where \(q\) is the variable that determines at which vertical displacement the leg path transitions from primarily an vertical motion to
             an arc motion. Figure \ref{fig:sigmoid_like} illustrates the sigmoid like function for different values of \(q\).
             \begin{figure}[h]
                 \centering
@@ -271,9 +271,3 @@ on entering the "Stepping" state. This function is described in section \ref{sec
 
             \noindent
             Note that the 0.515 and 0.505 values in equation \ref{eq:sigmoid} are set to make its output range from roughly -1 to 0 over the active range.
-
-
-
-
-
-

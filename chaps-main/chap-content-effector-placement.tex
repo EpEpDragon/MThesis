@@ -1,4 +1,4 @@
-\chapter{End Effector Anchor Point Adjustment} \label{chap:effector-placement}
+\chapter{Foot Placement Optimisation} \label{chap:effector-placement}
 The best possible anchor points for the supporting feet, given an initial point from the walking
 gait state machine, must be found based on the heightmap. This is done by applying various
 scores to the heightmap and selecting a point with the best score within an allowable
@@ -19,7 +19,7 @@ deviation from the initial point received from the gait state machine.
         Equation \ref{eq:sobelgx} and \ref{eq:sobelgy} describe the two separable x and y direction kernels, \(G_x\) and \(G_y\),
         of the Sobel operator. These kernels are a combination of central finite difference and smoothing operator, see Appendix \ref{app:sobel} 
         for a breakdown. Equation \ref{eq:sobelsg} combines \(G_x\) and \(G_y\) to produce the gradient score, \(S_g\). Note that these equations represent
-        a single scalar result of the Sobel operator using the frobenius inner product, \cite{horn2012matrix}. If evaluated over the whole height image this is equivalent
+        a single scalar result of the Sobel operator using the Frobenius inner product, \cite{horn2012matrix}. If evaluated over the whole heightmap this is equivalent
         to convolution.
         \begin{align}
             \begin{split} \label{eq:sobelgx}
@@ -52,12 +52,19 @@ deviation from the initial point received from the gait state machine.
             \end{split}\\[0.3cm]
             S_g(x,y) &= C_g\sqrt{G_x(x,y)^2 + G_y(x,y)^2} \label{eq:sobelsg}
         \end{align}
-        \begin{center}
-            Where \(i = \big[\mkern-4.7mu\big[x-1,\mkern2mu x+1\big]\mkern-4.7mu\big]\) and \(j = \big[\mkern-4.7mu\big[y-1,\mkern2mu y+1\big]\mkern-4.7mu\big]\)
-        \end{center}
+        where,
+        \[i = \big[\mkern-4.7mu\big[x-1,\mkern2mu x+1\big]\mkern-4.7mu\big]\]
+        \[j = \big[\mkern-4.7mu\big[y-1,\mkern2mu y+1\big]\mkern-4.7mu\big]\]
         \noindent
-        With \(C_g\) being the weighting constant associated with the gradient score, \(S_g\).
+        with \(C_g\) being the weighting constant associated with the gradient score, \(S_g\).
         
+        \captionsetup[figure]{oneside,margin={0.9cm,0cm}}
+        \begin{figure}[h]
+            \centering
+            \includegraphics{slope_score.pdf}
+            \caption{Slope Score}
+            \label{fig:slope_score}
+        \end{figure}
 
     \subsection{Terrain Proximity Score}
     The proximity score aims to bias the selected anchor point away from points near steep inclines in the terrain. This score is defined as the average of the height
@@ -69,17 +76,26 @@ deviation from the initial point received from the gait state machine.
         S_p(x,y) = C_p\left|\frac{\sum\left\langle\boldsymbol{K},(\boldsymbol{h}_{i,j}-\boldsymbol{h}_{x,y})\right\rangle _{\mkern-3mu F}}{n^2}\right|
     \end{equation}
 
-    \begin{center}
-        Where \(i = \big[\mkern-4.7mu\big[x- \lfloor\frac{1}{2}n\rfloor,\mkern2mu x+\lfloor\frac{1}{2}n\rfloor\big]\mkern-4.7mu\big]\) 
-        and \(j = \big[\mkern-4.7mu\big[y-\rfloor (n-1),\mkern2mu y+\rfloor (n-1)\big]\mkern-4.7mu\big]\)
-    \end{center}
+    \noindent
+    where,
+    \[i = \big[\mkern-4.7mu\big[x- \lfloor\tfrac{1}{2}n\rfloor,\mkern2mu x+\lfloor\tfrac{1}{2}n\rfloor\big]\mkern-4.7mu\big]\]
+    \[j = \big[\mkern-4.7mu\big[y-\lfloor\tfrac{1}{2}n\rfloor,\mkern2mu y+ \lfloor\tfrac{1}{2}n\rfloor\big]\mkern-4.7mu\big]\]
+    
     
     \noindent
-    With \(x\) and \(y\) being the indices of the cell whose score is currently being evaluated, \(\boldsymbol{h}\) the
+    with \(x\) and \(y\) being the indices of the cell whose score is currently being evaluated, \(\boldsymbol{h}\) the
     heightmap and \(C_p\) the score's weighting constant.
     
     A diagrammatic, sliced, representation of the proximity score can be seen in Figure \ref{fig:prox_score_diagram}. The
     slice is taken along the x axis of the heightmap.
+
+    \captionsetup[figure]{oneside,margin={0.9cm,0cm}}
+    \begin{figure}[h]
+        \centering
+        \includegraphics{prox_score.pdf}
+        \caption{Proximity Score Diagrammatic Representation}
+        \label{fig:prox_score_diagram}
+    \end{figure}
 
     \subsection{Constraints}
     It is important to constrain the possible anchor points to confer to the stability triangle,
@@ -102,3 +118,31 @@ deviation from the initial point received from the gait state machine.
     See Figure \ref{fig:score_search} for a diagram representing the search pattern for a 5 grid squares search area.
     Note that this search pattern will become inaccurate for large search areas, as the pattern steps
     in a square manner. This however is not much of a concern for smaller search areas.
+
+    \captionsetup[figure]{oneside,margin={0cm,0cm}}
+    \begin{figure}[h]
+        \centering
+        \includegraphics{search_diagram.pdf}
+        \caption{Radial search, shown for a 5 cell search diameter.}
+        \label{fig:radial_search}
+    \end{figure}
+
+    \section{Height Adjustment}
+    After the horizontal position of the feet have been optimised, the height of the foot is simply set to the height of the
+    terrain at the target horizontal coordinates. This ensures that the robots body remains level and at a constant global height.
+
+    It is however important to adjust the reference floor height that the robot uses, if this is not done, then the robot will be
+    incapable of surmounting terrain higher than its commanded standing height, as the robot will simply maintain said height and walk into the tall terrain.
+    There are various methods to choosing a floor height, from using 
+    a time of flight sensor underneath the robots main body to using height data from the heightmap.
+
+    The method that was implemented in this paper uses the average of three highest target positions out of all the robots legs.
+    This allows the robot to preemptively increase ore decrease its floor hight as it targets to step onto higher or lower terrain.
+
+    \captionsetup[figure]{oneside,margin={0cm,0cm}}
+    \begin{figure}[h]
+        \centering
+        \includegraphics{Diagrams-FloorHeight .drawio.pdf}
+        \caption{Floor height diagram.}
+        \label{fig:floor_height}
+    \end{figure}
