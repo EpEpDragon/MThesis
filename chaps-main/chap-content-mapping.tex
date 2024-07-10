@@ -5,8 +5,28 @@ map is used to analyse the terrain and find an appropriate point to place the th
 It is possible to also use the sparse map for autonomous navigation, however this use case in not covered in this paper.
 This chapter covers the design of the mapping system.
 
-\section{Localisation And Sparse Map}
-    The localisation, sparse mapping and pose estimation is handle by ORB-SLAM3 as described in \cite{campos2021orb}. Since ORB-SLAM3 is not a system designed by the author, its
-    design will not be covered in this chapter. Implementation and operation details will however be covered in chapters \ref{chap:hardware} and \ref{chap:results}.
+The localisation, sparse mapping and pose estimation is handle by ORB-SLAM3 as described in \cite{campos2021orb}. Since ORB-SLAM3 is not a system designed by the author, its
+design will not be covered in this chapter. Implementation and operation details will however be covered in chapters \ref{chap:hardware} and \ref{chap:results}.
 
-\section{Dense Map}
+\section{Projection}
+In order to generate a heightmap from a \ac{rgbd} image, it is first required to project the \ac{rgbd} image into 3D space, this is necessary because a heightmap is essentially a 3D environment,
+that can be represented as a image due to the assumption of purely convex geometry. 
+
+The camera can be described by its intrinsic and extrinsic parameters. Extrinsic parameters characterise the
+cameras position in 3D space, as localisation is handled by ORB\ac{slam}3 it is not required to utilise the extrinsics. What will be used are the intrinsics, they parametarise 
+the relationship between the image plane 3D space, assuming the camera is at the world origin and an zero rotation. \cite{hartley2003multiple}
+
+The intrinsic matrix can be seen described in equation \ref{eq:intrinsics}.
+\begin{equation} \label{eq:intrinsics}
+    K =
+    \begin{bmatrix}
+        \alpha_x & \gamma   & u_0 \\
+        0        & \alpha_y & u_0 \\
+        0        & 0        & 1
+    \end{bmatrix}
+\end{equation}
+
+
+
+\section{Memory}
+
