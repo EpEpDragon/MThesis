@@ -158,24 +158,24 @@ where \(I_{u,v}\) is the depth image value at pixel coordinates \(u,v\). For lat
 
         However, due to the circular nature of the map buffer, translating from map to local space is more challenging. First an intermediate position, \(\boldsymbol{\nu_{temp}}\) is defined as a helper,
         \begin{equation} \label{eq:map_to_local_help}
-            \boldsymbol{\nu^{temp}} = \boldsymbol{\nu^{map}}\frac{1}{S}
+            \boldsymbol{\nu_{temp}} = \boldsymbol{\nu_{map}}\frac{1}{S}
         \end{equation}
-        now \(\boldsymbol{\nu^{temp}}\) must be checked to see if either of its coordinates exceed half the map extents, if so, then it must be adjusted such that both coordinates fall within \(\frac{1}{2}E\).
+        now \(\boldsymbol{\nu_{temp}}\) must be checked to see if either of its coordinates exceed half the map extents, if so, then it must be adjusted such that both coordinates fall within \(\frac{1}{2}E\).
         This is expressed in equation \ref{eq:map_to_local_adj}
         \begin{equation} \label{eq:map_to_local_adj}
-            \boldsymbol{\nu^{temp}} \Leftarrow 
+            \boldsymbol{\nu_{temp}} \Leftarrow 
             \begin{cases}
-                \boldsymbol{\nu^{temp}} & \boldsymbol{\nu^{temp}} \leq \frac{1}{2}E \\
-                \boldsymbol{\nu^{temp}} - E\sgn \boldsymbol{\nu^{temp}} & \boldsymbol{\nu^{temp}} > \frac{1}{2}E
+                \boldsymbol{\nu_{temp}} & \boldsymbol{\nu_{temp}} \leq \frac{1}{2}E \\
+                \boldsymbol{\nu_{temp}} - E\sgn \boldsymbol{\nu_{temp}} & \boldsymbol{\nu_{temp}} > \frac{1}{2}E
             \end{cases}
         \end{equation}
-        where \(\sgn\) is the signum function, which return either 1 or -1 depending on the sign of the operand.
-        Note that equation \ref{eq:map_to_local_adj} is applied to both coordinates in the vector \(\boldsymbol{\nu^{temp}}\) separately, in pursuit of readability this is not explicitly stated.
+        where \(\sgn\) is the signum function, which return either 1 or -1 depending on the sign of the operand. 
+        \textbf{Note} that equation \ref{eq:map_to_local_adj} is applied to both coordinates in the vector \(\boldsymbol{\nu_{temp}}\) separately, in pursuit of readability this is not explicitly stated.
 
-        Now that \(\boldsymbol{\nu^{temp}}\) has been corrected for the circular nature of the map buffer, only the rotating into the local space remains.
+        Now that \(\boldsymbol{\nu_{temp}}\) has been corrected for the circular nature of the map buffer, only the rotating into the local space remains.
 
         \begin{equation} \label{eq:map_to_local_rot}
-            \boldsymbol{\nu^{loc}} = \boldsymbol{q_{bod}}^{-1} \cdot \boldsymbol{\nu^{temp}} \cdot \boldsymbol{q_{bod}}
+            \boldsymbol{\nu_{loc}} = \boldsymbol{q_{bod}}^{-1} \cdot \boldsymbol{\nu_{temp}} \cdot \boldsymbol{q_{bod}}
         \end{equation}
 
 
