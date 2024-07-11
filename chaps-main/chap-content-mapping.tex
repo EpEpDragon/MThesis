@@ -40,7 +40,7 @@ as shown in equation \ref{eq:projection_matrix},
 where \(\boldsymbol{K}\) is the intrinsic matrix and \(\begin{bmatrix} \boldsymbol{R} & \boldsymbol{T} \end{bmatrix}\) the extrinsic matrix, these are described
 in equation \ref{eq:intrinsic} and \ref{eq:extrinsic}.
 
-The projection matrix can be used to project a point on the projection plane into world space as shown in equation \ref{eq:full_projection}.
+The projection matrix can be used to project a point on the image plane into world space as shown in equation \ref{eq:full_projection}.
 
 \begin{equation} \label{eq:full_projection}
     \begin{bmatrix}
@@ -56,7 +56,7 @@ The projection matrix can be used to project a point on the projection plane int
         1
     \end{bmatrix}
 \end{equation}
-where \(u,v\) are the pixel coordinates on the projection plane and \(x,y,z\) are the coordinates in world space.
+where \(u,v\) are the pixel coordinates on the image plane and \(x,y,z\) are the coordinates in world space.
 \begin{equation} \label{eq:intrinsic}
     \boldsymbol{K} =
     \begin{bmatrix}
@@ -68,8 +68,8 @@ where \(u,v\) are the pixel coordinates on the projection plane and \(x,y,z\) ar
 where the focal length is represented by,
 \[\alpha_x = f \cdot m_y\]
 \[\alpha_y = f \cdot m_x\]
-with \(m_x\) and \(m_y\) being the inverse of the width and height of a projection plane pixel, \(f\) the focal length and \(u_0\),\(v_0\) being the principal point, optimally the center of the projection plane.
-The skew coefficient, \(\gamma\), is often (and in this case) 0.
+with \(m_x\) and \(m_y\) being the inverse of the width and height of a image plane pixel, \(f\) the focal length and \(u_0\),\(v_0\) being the principal point, optimally the center of the image plane.
+The skew coefficient, \(\gamma\), is often, and in this case, 0.
 
 The extrinsic matrix is as shown below,
 \begin{equation}\label{eq:extrinsic}
