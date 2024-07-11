@@ -111,12 +111,39 @@ The resultant matrix equation is shown in equation \ref{eq:local_projection}.
 \end{equation}
 From equation \ref{eq:local_projection} \(x,y,z\) are found to be show in equation \ref{eq:proj_z} to \ref{eq:proj_y}.
 \begin{align}
-    z &= D_{u,v} \label{eq:proj_z}\\[0.2cm]
+    z &= I_{u,v} \label{eq:proj_z}\\[0.2cm]
     x &= \frac{z(u - u_0)}{\alpha_x}\label{eq:proj_x} \\
     y &= \frac{z(v - v_0)}{\alpha_y}\label{eq:proj_y}
 \end{align}
-where \(D_{u,v}\) is the depth image pixel value at pixel coordinate \(u,v\).
+where \(I_{u,v}\) is the depth image value at pixel coordinates \(u,v\). For later use \(\boldsymbol{p_{proj}} = [x \; y \; z]\) is defined.
 
+\newpage
+\section{Map Buffer}
+    Once the depth image is projected into map space, their x and y coordinates are used as indices to write their z value into the heightmap. The heightmap is stored in
+    a 2D circular buffer, this means that as the robot moves around, old map data is erased to make room for new data. This structure is illustrated in figure \ref{fig:memory}.
+    \begin{figure}[h]
+        \centering
+        \includegraphics{Diagrams-Memory.drawio.pdf}
+        \caption{Memory Diagram}
+        \label{fig:memory}
+    \end{figure}
 
-\section{Memory}
+    The heightmap buffer, \(\boldsymbol{M}\), is of size \(N \times N\) and is indexed by \(i,j\). The mapping from the projection center relative points, \(\boldsymbol{p_{proj}}\), into map space
+    is defined in equation \ref{eq:project_to_map},
+    \begin{equation} \label{eq:project_to_map}
+        \boldsymbol{p_{map}} = (\boldsymbol{q} \cdot \boldsymbol{p_{proj}} \cdot \boldsymbol{q}^{-1}S + \boldsymbol{\nu_{map}}) \mod N
+    \end{equation}
+    where \(\boldsymbol{q}\) is the camera quaternion that rotates \(\boldsymbol{p_{proj}}\) into world space, with its \(z\) axis pointing upwards, \(\boldsymbol{\nu_{map}}\) 
+    is the coordinate vector of the robot in map space, and \(S\) is the scaling factor
+    used to relate heightmap cells to \(cm\). The relationship between \(N, S\) and \(E\) are characterised by equation \ref{eq:map_scaling}.
+    \begin{equation} \label{eq:map_scaling}
+        N = E \cdot S
+    \end{equation}
+    where E is the size of the heightmap in \(cm\).
+
+    The robots coordinates in the map space, \(\boldsymbol{\nu_{map}}\), can be found as shown in equation \ref{eq:map_i},
+    \begin{equation} \label{eq:map_i}
+        \boldsymbol{\nu_{map}} = \boldsymbol{\nu_{world}} \mod N
+    \end{equation}
+    where \(\boldsymbol{\nu_{world}}\) is the coordinate of the robot in world space.
 
