@@ -128,9 +128,9 @@ on entering the "Stepping" state. This function is described in section \ref{sec
     \end{equation}
     where \(\bm{\Delta \kappa} \inrefframe{L}\) is calculated as the difference between the robot's (body's) current position and its position at the beginning of the previous step,
     \begin{equation}
-        \mdim{\Delta \kappa}{1}{3} = \bm{\kappa}-\bm{p_{prv}} \transframe{G}{L}
+        \mdim{\Delta \kappa}{1}{3} = \bm{\kappa}-\bm{\kappa_{prv}} \transframe{W}{L}
     \end{equation}
-    where \(\bm{\kappa} \inrefframe{G}\) is the robot's current position, and \(\bm{\kappa}_{prv} \inrefframe{G}\) is the robot's position at the beginning of the previous step.
+    where \(\bm{\kappa} \inrefframe{W}\) is the robot's current position, and \(\bm{\kappa_{prv}} \inrefframe{W}\) is the robot's position at the beginning of the previous step.
 
     Additionally, for use in equation \ref{eq:move_vec}, the swinging legs nominal targets, \(\bm{t_{nom}} \inrefframe{L}\), are calculated as in equation \ref{eq:swing_nom},
     \begin{equation} \label{eq:swing_nom}
