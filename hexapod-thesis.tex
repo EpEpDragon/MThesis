@@ -14,7 +14,14 @@
 \usepackage{amsmath}%............................. Advanced math (before fonts)
 %\usepackage{amssymb}%............................ AMS Symbol fonts
 \usepackage{scalerel}
-\DeclareMathOperator{\sgn}{\boldsymbol{sgn}}
+\usepackage{stackengine}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\avg}{avg}
+\newcommand{\transframe}[2]{\ifmmode \quad (\mathcal{#1} \rightarrow \mathcal{#2}) \else \((\mathcal{#1} \rightarrow \mathcal{#2})\)  \fi}
+\newcommand{\inrefframe}[1]{\bigcirc\mathcal{#1}}
+\newcommand{\mdim}[3]{\underset{\scriptscriptstyle#2 \times #3}{\bm{#1}\strut}}
+
+
 
 %==== Font setup (default is Computer Modern) ========================
 \usepackage{iftex}
@@ -35,6 +42,7 @@
     \usepackage{bm}%.............................. Bold math fonts
 \fi
 \normalfont
+\usepackage{amsfonts}
 
 %==== Units and numbers ==============================================
 \usepackage{siunitx}%............................. Unit, number and angle output

@@ -115,7 +115,13 @@ From equation \ref{eq:local_projection} \(x,y,z\) are found to be show in equati
     x &= \frac{z(u - u_0)}{\alpha_x}\label{eq:proj_x} \\
     y &= \frac{z(v - v_0)}{\alpha_y}\label{eq:proj_y}
 \end{align}
-where \(I_{u,v}\) is the depth image value at pixel coordinates \(u,v\). For later use \(\boldsymbol{p_{proj}} = [x \; y \; z]\) is defined.
+where \(I_{u,v}\) is the depth image value at pixel coordinates \(u,v\). For later use the variable \(\boldsymbol{p_{cam}} \inrefframe{C}\) is defined as in equation \ref{eq:pcam},
+\begin{equation}\label{eq:pcam}
+    \bm{p_{cam}}=
+    \begin{bmatrix}
+        x &y &z
+    \end{bmatrix}
+\end{equation}
 
 \newpage
 \section{Map Buffer}
@@ -128,12 +134,12 @@ where \(I_{u,v}\) is the depth image value at pixel coordinates \(u,v\). For lat
         \label{fig:memory}
     \end{figure}
 
-    The heightmap buffer, \(\boldsymbol{M}\), is of size \(N \times N\) and is indexed by \(i,j\). The mapping from the projection center relative points, \(\boldsymbol{p_{proj}}\), into map space
+    The heightmap buffer, \(\boldsymbol{M}\), is of size \(N \times N\) and is indexed by \(i,j\). The mapping from the camera relative points, \(\boldsymbol{p_{cam}} \inrefframe{C}\), into map space
     is defined in equation \ref{eq:project_to_map},
     \begin{equation} \label{eq:project_to_map}
-        \boldsymbol{p_{map}} = (\boldsymbol{q} \cdot \boldsymbol{p_{proj}} \cdot \boldsymbol{q}^{-1}S + \boldsymbol{\nu_{map}}) \mod N
+        \boldsymbol{p_{map}} = (\boldsymbol{q} \cdot \boldsymbol{p_{cam}} \cdot \boldsymbol{q}^{-1}S + \boldsymbol{\kappa_{map}}) \mod N
     \end{equation}
-    where \(\boldsymbol{q}\) is the camera quaternion that rotates \(\boldsymbol{p_{proj}}\) into world space, with its \(z\) axis pointing upwards, \(\boldsymbol{\nu_{map}}\) 
+    where \(\boldsymbol{q}\) is the camera quaternion that rotates \(\boldsymbol{p_{cam}}\) into world space, with its \(z\) axis pointing upwards, \(\boldsymbol{\kappa_{map}}\) 
     is the coordinate vector of the robot in map space, and \(S\) is the scaling factor
     used to relate heightmap cells to \(cm\). The relationship between \(N, S\) and \(E\) are characterised by equation \ref{eq:map_scaling}.
     \begin{equation} \label{eq:map_scaling}
@@ -141,11 +147,11 @@ where \(I_{u,v}\) is the depth image value at pixel coordinates \(u,v\). For lat
     \end{equation}
     where E is the size of the heightmap in \(cm\).
 
-    The robots coordinates in the map space, \(\boldsymbol{\nu_{map}}\), can be found as shown in equation \ref{eq:map_i},
+    The robots coordinates in the map space, \(\boldsymbol{\kappa_{map}}\), can be found as shown in equation \ref{eq:map_i},
     \begin{equation} \label{eq:map_i}
-        \boldsymbol{\nu_{map}} = \boldsymbol{\nu_{world}} \mod N
+        \boldsymbol{\kappa_{map}} = \boldsymbol{\kappa_{world}} \mod N
     \end{equation}
-    where \(\boldsymbol{\nu_{world}}\) is the coordinate of the robot in world space.
+    where \(\boldsymbol{\kappa_{world}}\) is the coordinate of the robot in world space.
 
     \subsection{Between Map and Local Space}
         As the robot commands foot positions in local space, when optimising foot positions (see chapter \ref{chap:optimisation}) it is required to have a translation between map and local space.
@@ -153,29 +159,29 @@ where \(I_{u,v}\) is the depth image value at pixel coordinates \(u,v\). For lat
         
         Local to map space is a simple translation, very similar to equation \ref{eq:project_to_map},
         \begin{equation} \label{eq:local_to_map}
-            \boldsymbol{\nu_{map}} = (\boldsymbol{q_{bod}} \cdot \boldsymbol{\nu_{loc}} \cdot \boldsymbol{q_{bod}}^{-1} + \boldsymbol{\nu_{map}}) \mod N
+            \boldsymbol{\kappa_{map}} = (\boldsymbol{q_{bod}} \cdot \boldsymbol{\kappa_{loc}} \cdot \boldsymbol{q_{bod}}^{-1} + \boldsymbol{\kappa_{map}}) \mod N
         \end{equation}
 
-        However, due to the circular nature of the map buffer, translating from map to local space is more challenging. First an intermediate position, \(\boldsymbol{\nu_{temp}}\) is defined as a helper,
+        However, due to the circular nature of the map buffer, translating from map to local space is more challenging. First an intermediate position, \(\boldsymbol{\kappa_{temp}}\), is defined as a helper,
         \begin{equation} \label{eq:map_to_local_help}
-            \boldsymbol{\nu_{temp}} = \boldsymbol{\nu_{map}}\frac{1}{S}
+            \boldsymbol{\kappa_{temp}} = \boldsymbol{\kappa_{map}}\frac{1}{S}
         \end{equation}
-        now \(\boldsymbol{\nu_{temp}}\) must be checked to see if either of its coordinates exceed half the map extents, if so, then it must be adjusted such that both coordinates fall within \(\frac{1}{2}E\).
+        where \(\boldsymbol{\kappa_{temp}}\) is the map coordinates scaled back into world coordinates. Now \(\boldsymbol{\kappa_{temp}}\) must be checked to see if either of its coordinates exceed half the map extents, if so, then it must be adjusted such that both coordinates fall within \(\frac{1}{2}E\).
         This is expressed in equation \ref{eq:map_to_local_adj}
         \begin{equation} \label{eq:map_to_local_adj}
-            \boldsymbol{\nu_{temp}} \Leftarrow 
+            \boldsymbol{\kappa_{temp}} \Leftarrow 
             \begin{cases}
-                \boldsymbol{\nu_{temp}} & \boldsymbol{\nu_{temp}} \leq \frac{1}{2}E \\
-                \boldsymbol{\nu_{temp}} - E\sgn \boldsymbol{\nu_{temp}} & \boldsymbol{\nu_{temp}} > \frac{1}{2}E
+                \boldsymbol{\kappa_{temp}} & \boldsymbol{\kappa_{temp}} \leq \frac{1}{2}E \\
+                \boldsymbol{\kappa_{temp}} - E\sgn \boldsymbol{\kappa_{temp}} & \boldsymbol{\kappa_{temp}} > \frac{1}{2}E
             \end{cases}
         \end{equation}
         where \(\sgn\) is the signum function, which return either 1 or -1 depending on the sign of the operand. 
-        \textbf{Note} that equation \ref{eq:map_to_local_adj} is applied to both coordinates in the vector \(\boldsymbol{\nu_{temp}}\) separately, in pursuit of readability this is not explicitly stated.
+        \textbf{Note} that equation \ref{eq:map_to_local_adj} is applied to both coordinates in the vector \(\boldsymbol{\kappa_{temp}}\) separately, in pursuit of readability this is not explicitly stated.
 
-        Now that \(\boldsymbol{\nu_{temp}}\) has been corrected for the circular nature of the map buffer, only the rotating into the local space remains.
+        Now that \(\boldsymbol{\kappa_{temp}}\) has been corrected for the circular nature of the map buffer, only the rotating into the local space remains.
 
         \begin{equation} \label{eq:map_to_local_rot}
-            \boldsymbol{\nu_{loc}} = \boldsymbol{q_{bod}}^{-1} \cdot \boldsymbol{\nu_{temp}} \cdot \boldsymbol{q_{bod}}
+            \boldsymbol{\kappa_{loc}} = \boldsymbol{q_{bod}}^{-1} \cdot \boldsymbol{\kappa_{temp}} \cdot \boldsymbol{q_{bod}}
         \end{equation}
 
 
