@@ -4,7 +4,7 @@ gait state machine, must be found based on the heightmap. This is done by applyi
 scores to the heightmap and selecting a point with the best score within an allowable
 deviation from the initial point received from the gait state machine.
 
-\section{Scoring}
+\section{Scoring} \label{sec:scores}
     The scores considered are the gradient and proximity scores. The gradient score aims to reject points with high gradients while the proximity score rejects points close
     to other parts of the terrain with steep inclines, i.e. to reject points inside holes or close to ledges.
     \subsection{Gradient Score}
@@ -104,7 +104,7 @@ deviation from the initial point received from the gait state machine.
     both in the horizontal and vertical direction for the robot to reach.
 
 
-\section{Method of adjustment}
+\section{Method of adjustment} \label{sec:radial_search}
     Once the heightmap has been processed into the score map, which is done by adding the
     slope score and terrain proximity score, the point with the best score must be found for every
     initial anchor point.
@@ -142,7 +142,12 @@ deviation from the initial point received from the gait state machine.
     \captionsetup[figure]{oneside,margin={0cm,0cm}}
     \begin{figure}[h]
         \centering
-        \includegraphics{Diagrams-FloorHeight .drawio.pdf}
+        \includegraphics[width=\textwidth]{Diagrams-FloorHeight .drawio.pdf}
         \caption{Floor height diagram.}
         \label{fig:floor_height}
     \end{figure}
+
+    While this method works well to preemptively adjust height and to optimise the body height against foot height, it does present one problem. If there is a tall piece of terrain in the path of the robots body
+    without any feet positioned on it, then the robot will not adjust its body height to clear this piece of terrain. 
+    Thus, the bounding box of the robots body, excluding the legs and feet, is checked against the heightmap
+    and if anywhere in the bounding box is higher than the previously set floor height, the floor height is adjusted to this new value.
