@@ -1,5 +1,7 @@
 \chapter{Results}
 
+\section{Requirements}
+
 \section{Depth Camera}
 
 \section{Heightmap}
@@ -22,6 +24,8 @@
         \caption{3D Model of Terrain and its heightmap.}
         \label{fig:score_test_map}
     \end{figure}
+
+    \noindent
     The heightmap in figure \ref{fig:sub_3d_terrain_hmap} is used to test the various walkability scores, first, in order to show individual results,
     the slope and edge proximity score is applied to the heightmap separately from each other, this is shown in figure \ref{fig:scores_seperate}. Next the combined score is
     shown in figure \ref{fig:full_score}, this is the score that is used to optimise foot end positions.
@@ -59,7 +63,7 @@
     This is shown in figure \ref{fig:optimisation_test}.
     \begin{figure}[h]
         \centering
-        \includegraphics[width=.7\textwidth]{scoreTestFinal.png}
+        \includegraphics[width=.6\textwidth]{scoreTestFinal.png}
         \caption{Walkability score optimisation test.}
         \label{fig:optimisation_test}
     \end{figure}
@@ -79,9 +83,65 @@
 \section{Walking}
     The final walking tests are comprised of three different terrains, a simple flat plane as a baseline, then a staircase to demonstrate simple foot and body height adjustment and
     finally a uneven organic like surface.
+    
+    When presenting testing data, a snapshot of the 3D simulation environment will be shown, with the body and foot paths traced. Additionally key data points
+    are also graphed, however only the height of a single foot will be graphed, this is to maintain clarity.
 
     \subsection{Flat Plane}
+    The flat plane test aims to quantify nominal body height oscillations and to provide a baseline to compare subsequent test to.
+    Figure \ref{fig:plane_test} and \ref{fig:plane_test_data} shows the test results of walking over a simple flat plane, as expected the the step sizes and arcs are uniform with no optimisation necessary.
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=.8\textwidth]{WalkTestPlane.png}
+        \includegraphics[width=.8\textwidth]{WalkTestPlaneTop.png}
+        \caption{Flat plane walk test}
+        \label{fig:plane_test}
+    \end{figure}
+    \begin{figure}[h]
+        \centering
+        \includegraphics{data_plane.pdf}
+        \caption{Body height (top). Body tilt (center). Position of one foot (bottom)}
+        \label{fig:plane_test_data}
+    \end{figure}
+    
+    \noindent
+    From figure \ref{fig:plane_test_data} it can be seen that there is a constant error of about 1cm in the body height of the robot, this can be easily solved by adding a constant offset or adding integral 
+    control to the leg servos. It is also clear that as the robot walks there are some oscillations in the body height, this is to be expected and the oscillations are lower than the \(10\%\) desired body height specification.
+        
+    Next it can be seen that the tilt of the body, in both roll and pitch, tends to stay below \(0.5^\circ\), which is well within specifications. It is also possible to further improve
+    the tilt error by incorporating accelerometer based feedback control to the feet heights. Finally, the height of one of the legs are shown, from this it is clear that the robot takes
+    uniform, stable steps.
+
+    \newpage
     \subsection{Staircase}
+    The staircase test demonstrates the ability of the robot to adjust the height of its feet in order to maintain a level body,
+    additionally the ability of the robot to automatically adjust its height relative to the floor is also demonstrated. A 3D image
+    of this test can be seen in figure \ref{fig:stairs_test} and the data plots in figure \ref{fig:stairs_test_data}.
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=.8\textwidth]{WalkTestStairts.png}
+        \includegraphics[width=.8\textwidth]{WalkTestStairtsTop.png}
+        \caption{Stairs walk test}
+        \label{fig:stairs_test}
+    \end{figure}
+    \begin{figure}[h]
+        \centering
+        \includegraphics{data_stairs.pdf}
+        \caption{Body height (top). Body tilt (center). Position of one foot (bottom)}
+        \label{fig:stairs_test_data}
+    \end{figure}
+
+    Similarly to the flat plane test, as expected, the constant body height error is still present.
+    However, from this test it can be seen in figure \ref{fig:stairs_test_data} that the robot does increase its height to maintain a constant
+    height above the terrain. It is clear that the body height is not increased in the four discrete steps as the stairs do, rather the
+    body height is increased more smoothly using many smaller steps. This is thanks to the system described in section \ref{sec:height_adjust}.
+
+    Body tilt, while more prominent than in the flat plane test, is still quite low as it largely stays below \(1.0^\circ\), with intermittent jumps approaching \(2.0^\circ\).
+    This is still within the specifications, and as previously stated could easily be improved by incorporating accelerometer based feedback control on the foot height.
+
+    Finally, the foot height plot clearly shows how one of the feet of the robot adjusts its height and step arc based on the terrain. Otherwise the foot arc looks very similar to that of the
+    flat plane test, which is optimal.
+
     \subsection{Organic}
     \captionsetup[figure]{oneside,margin={0.9cm,0cm}}
     \begin{figure}[h]
