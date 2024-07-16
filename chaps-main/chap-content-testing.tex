@@ -141,12 +141,36 @@
 
     Finally, the foot height plot clearly shows how one of the feet of the robot adjusts its height and step arc based on the terrain. Otherwise the foot arc looks very similar to that of the
     flat plane test, which is optimal.
-
+    
+    \newpage
     \subsection{Organic}
+    The organic test aims to show how the robot can place feet on an appropriate spot on the terrain, while maintaining level and a certain height. Figure \ref{fig:org_test} shows the
+    3D view of the test.
     \captionsetup[figure]{oneside,margin={0.9cm,0cm}}
     \begin{figure}[h]
         \centering
-        \includegraphics[clip, trim=0 0.25cm 0 0.25cm]{body_data.pdf}
-        \caption{Body Data}
-        \label{fig:body_data}
+        \includegraphics[width=.8\textwidth]{WalkTestOrg.png}
+        \includegraphics[width=.8\textwidth]{WalkTestOrgTop.png}
+        \caption{Organic walk test.}
+        \label{fig:org_test}
     \end{figure}
+    \begin{figure}[h]
+        \centering
+        \includegraphics{data_org.pdf}
+        \caption{Body height (top). Body tilt (center). Position of one foot (bottom)}
+        \label{fig:org_test_data}
+    \end{figure}
+
+    From figure \ref{fig:org_test_data} it can be seen that the body height error seen in the flat plane test
+    is still present and more severe. But the body does stay within a reasonable margin from the desired height.
+
+    For most part the body tilt is similar to that of the stairs test, however more frequent and more sever spikes are present.
+    This is due, in part, to the more erratic mismatch between the body height and the requested body heigh. The horizontal adjustments made to 
+    the foot end positions cause the swinging feet to end their steps at different times, this is the primary cause of the tilt spikes, as when one
+    foot is placed on the floor before the other two, the robot is tilted slightly. This, however, would not occur if there was no, or little, 
+    error in the body height.
+
+    Finally, when looking at the foot position plot in figure \ref{fig:org_test_data}, please note that the plot is a projection into the X-Z plane, and thus any
+    adjustment made in the Y-axis is not shown, the foot shown has been chosen to include minimum Y-axis variation. 
+    Thus, please also see the 3D view in figure \ref{fig:org_test}. From these two figures it is clear that the foot end positions are, in addition to height,
+    adjusted in the horizontal plane, the step arcs are appropriately adjusted and remain relatively smooth, similar to the flat plane test.
