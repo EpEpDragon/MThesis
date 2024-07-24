@@ -18,8 +18,10 @@
 \DeclareMathOperator{\sgn}{sgn}
 \DeclareMathOperator{\avg}{avg}
 \newcommand{\transframe}[2]{\ifmmode \quad (\mathcal{#1} \rightarrow \mathcal{#2}) \else \((\mathcal{#1} \rightarrow \mathcal{#2})\)  \fi}
-\newcommand{\inrefframe}[1]{\bigcirc\mathcal{#1}}
-\newcommand{\mdim}[3]{\underset{\scriptscriptstyle#2 \times #3}{\bm{#1}\strut}}
+\newcommand{\inrefframe}[1]{^\mathcal{#1}}
+\newcommand{\mdim}[3]{\underset{\scriptscriptstyle#2 \times #3}{#1\strut}}
+\newcommand{\seq}[3]{(#1,#2,\;\dots,#3)}
+\newcommand{\refframe}[1]{\mathcal{#1}}
 
 
 
@@ -180,6 +182,7 @@
 \include{chaps-main/chap-conclusion}
 
 \appendix%------------------------------------------------------------
+\include{chaps-append/chap-transforms}
 \include{chaps-append/chap-maths}
 \include{chaps-append/chap-experiment}
 

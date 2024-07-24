@@ -22,12 +22,11 @@
     \item[$a$]          Coordinate
 
 \NomGroup{Notation}
-    \item[{\([\![a..b]\!]\)}] Defines an integer sequence from \(a\) to \(b\), including \(a\) and \(b\), with a increment of 1.
+    \item[\(\seq{a_0}{a_1}{a_n}\)] Defines a integer sequence from \(a_0\) to \(a_n\), with a increment of \(a_1-a_0\).
     \item[\(x\inrefframe{A}\)] Indicates that \(x\) is in reference frame \(\mathcal{A}\).
-    \item[\(x\transframe{A}{B}\)] Transforms \(x\inrefframe{A}\) to reference frame \(\mathcal{B}\).\footnote{See appending \ref{app:transforms} for transform definitions.}
-
-    \hspace{0.5cm} Thus, \(\left[x\inrefframe{A}\transframe{A}{B}\right]\inrefframe{B}\).
-    \item[\(\mathcal{W}\)] Indicates the world reference frame.\footnote{\label{note1}See appending \ref{app:frames} for reference frame definitions.}
+    \item[\(x\transframe{A}{B}\)] Transforms \(x\inrefframe{A}\) to reference frame \(\mathcal{B}\),\footnote{See appendix \ref{app:transforms} for transform definitions.} 
+    such that the resultant point in global space stays constant, meaning, \(\left[x\inrefframe{A}\transframe{A}{B}\right]\inrefframe{B}\)
+    \item[\(\mathcal{W}\)] Indicates the world reference frame.\footnote{\label{note1}See appendix \ref{app:frames} for reference frame definitions.}
     \item[\(\mathcal{L}\)] Indicates the local reference frame.\textsuperscript{\ref{note1}}
     \item[\(\mathcal{M}\)] Indicates the map reference frame.\textsuperscript{\ref{note1}}
     \item[\(\mathcal{C}\)] Indicates the camera reference frame.\textsuperscript{\ref{note1}}
