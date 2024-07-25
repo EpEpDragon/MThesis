@@ -18,10 +18,16 @@
 \DeclareMathOperator{\sgn}{sgn}
 \DeclareMathOperator{\avg}{avg}
 \newcommand{\transframe}[2]{\ifmmode \quad (\mathcal{#1} \rightarrow \mathcal{#2}) \else \((\mathcal{#1} \rightarrow \mathcal{#2})\)  \fi}
+\newcommand{\transframenew}[3]{\ifmmode T_{#2#3}(#1) \else \(T_{#2#3}(#1)\)  \fi}
 \newcommand{\inrefframe}[1]{^\mathcal{#1}}
-\newcommand{\mdim}[3]{\underset{\scriptscriptstyle#2 \times #3}{#1\strut}}
+\newcommand{\mdim}[3]{\underset{\scriptscriptstyle#2 \times #3}{#1}}
 \newcommand{\seq}[3]{(#1,#2,\;\dots,#3)}
-\newcommand{\refframe}[1]{\mathcal{#1}}
+\newcommand{\refframe}[1]{\ifmmode \mathcal{#1} \else \(\mathcal{#1}\) \fi}
+\newcommand{\fworld}{\refframe{W}}
+\newcommand{\fbody}{\refframe{B}}
+\newcommand{\fleg}{\refframe{L}}
+\newcommand{\fcamera}{\refframe{C}}
+\newcommand{\fmap}{\refframe{M}}
 
 
 
