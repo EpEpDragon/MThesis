@@ -111,7 +111,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
         \begin{figure}[h]
             \centering
             % \hspace{1.1cm}
-            \includegraphics[clip, trim=3.1cm 0.25cm 3.35cm 0.25cm]{Diagrams-ChooseNominalSupp.drawio.pdf}
+            \includegraphics[clip, trim=3cm 0.25cm 3.4cm 0.25cm]{Diagrams-ChooseNominalSupp.drawio.pdf}
             \caption{Supporting target choosing diagram} 
             \label{fig:supp_targ}
         \end{figure}
@@ -134,16 +134,19 @@ on entering the "Stepping" state. This function is described in section \ref{sec
 
     \newpage
     \subsubsection{For Swinging Legs} \label{sec:swing}
-        For the supporting legs, the nominal targets in map space, \(\bm{t_\text{nom}} \inrefframe{M}\) are calculated as in equation \ref{eq:t_map},
+        The swinging leg nominal targets are chosen with reference to figure \ref{fig:swinging_targ}.
         \begin{figure}[h]
             \centering
             % \hspace{1.1cm}
-            \includegraphics[clip, trim=3.25cm 0.25cm 5.1cm 0.3cm]{Diagrams-ChooseNominalSwing.drawio.pdf}
-            \caption{Supporting target choosing diagram} 
-            \label{fig:supp_targ}
+            \includegraphics[clip, trim=3.25cm 0.25cm 4.9cm 0.3cm]{Diagrams-ChooseNominalSwing.drawio.pdf}
+            \caption{Swinging target choosing diagram} 
+            \label{fig:swinging_targ}
         \end{figure}
+
+        \noindent
+        The nominal targets in map space, \(\bm{t_\text{nom}} ^{\fmap}\), are calculated as in equation \ref{eq:t_map},
         \begin{equation} \label{eq:t_map}
-            \mdim{\boldsymbol{t}_\text{nom}\inrefframe{M}}{3}{6} = \bm{T}^\fbody + \left(l_\text{str}+|\bm{m}^\fbody|\right)\bm{w}_{dir}^\fbody \transframe{L}{M}
+            \mdim{\boldsymbol{t}_\text{nom}^{\fmap}}{3}{6} = \bm{T}^\fbody + \left(l_\text{str}+|\bm{m}^\fbody|\right)\bm{w}_{dir}^\fbody \transframe{L}{M}
         \end{equation}
         where \(\bm{T}^\fbody\) contains the constant rest positions the feet, \(l_\text{str}\) is the desired stride length, \(\bm{w}_\text{dir}^\fbody\)
         contains the desired walk directions. \(\avg\bm{m}^\fbody\) is the average move vector 
@@ -154,15 +157,15 @@ on entering the "Stepping" state. This function is described in section \ref{sec
             \mdim{\boldsymbol{t}_\text{nom}^\fbody}{3}{6} = \bm{T}^\fbody + l_{str}\bm{w}_\text{dir}^\fbody
         \end{equation}
 
-        Note that \(\bm{t}_\text{nom}\inrefframe{M}\) is quite similar to \(\bm{t}_\text{nom}^\fbody\), the difference is that, 
-        assuming the \transframe{M}{L} transform is applied, \(\bm{t}_\text{nom}\inrefframe{M}\) is set such that it
+        Note that \(\bm{t}_\text{nom}^{\fmap}\) is quite similar to \(\bm{t}_\text{nom}^\fbody\), the difference is that, 
+        assuming the \transframe{M}{L} transform is applied, \(\bm{t}_\text{nom}^{\fmap}\) is set such that it
         will align with \(\bm{t}_\text{nom}^\fbody\)
         at the end of the step. Thus, the omission of the average supporting move vector, \(\avg \bm{m}^\fbody\), in calculating \(\bm{t}_\text{nom}^\fbody\)
         in equation \ref{eq:swing_nom}.
         Meaning at until the end of the step \(\bm{t}_\text{nom}\inrefframe{M}\) and \(\bm{t}_\text{nom}^\fbody\) will point 
         to different positions if world space. This is due to needing to account for body movement in world space, but not in local space.
 
-
+    \newpage
     \section{Foot Motion} \label{sec:arc_generation}
     When taking a step the foot can not simply be moved to its destination in a straight line, as doing so will cause the foot to be dragged on the terrain,
     impeding the movement of the robot. Thus it is required to move the foot in an arc like motion to clear any obstacles that might be in its path.
@@ -196,7 +199,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
         \begin{figure}[h]
             \centering
             \hspace{-1.38cm}
-            \includegraphics[clip, trim=0 3.25cm 0 0.25cm]{foot_path.pdf}
+            \includegraphics[clip, trim=0 0.25cm 0 0.25cm]{foot_path.pdf}
             \caption{End effector movement path}
             \label{fig:foot_arc}
         \end{figure}

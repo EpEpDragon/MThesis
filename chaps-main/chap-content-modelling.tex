@@ -1,8 +1,32 @@
 \chapter{System Overview}
-This chapter aims top provide a high level overview of the system proposed in this paper, after which detailed descriptions are given
-in the following chapters. The goal of maneuvering rough terrain is achieved by a combination of 4 primary systems, namely, a mapping, foot placement optimisation, motion controller and a \ac*{slam} system.
-For a overview of the system, see Figure \ref{fig:system_diagram}. The hexapod that the system is tested on can be seen in Figure \ref{fig:hexapod}.
+The proposed system aims to improve the walking capability of the robot, as reference see figure \ref{fig:basic_sys}
+\begin{figure}[h]
+    \centering
+    % \hspace{-1.38cm}
+    \includegraphics{Diagrams-SysDiffBlockBefore.drawio.pdf}
+    \caption{Basic system operation}
+    \label{fig:basic_sys}
+\end{figure}
 
+\noindent
+The basic system will work well enough for walking over flat terrain, but will struggle once any
+deviation in terrain height is present. Thus the proposed, more advanced system, operates with the flow shown in figure \ref{fig:adv_sys}.
+\begin{figure}[h]
+    \centering
+    % \hspace{-1.38cm}
+    \includegraphics{Diagrams-SysDiffBlockAfter.drawio.pdf}
+    \caption{Advanced system operation}
+    \label{fig:adv_sys}
+\end{figure}
+
+\noindent
+The advanced system uses similar components from the basic system, although theses basic components have difference that will be discussed in
+later chapters, but incorporates checks against a heightmap to validate, and, if necessary, adjust the nominal foot end positions and paths to
+move the feet to said positions. If the nominal positions are invalid and no valid adjustment can be made the robot will have to change
+its overall path, however this is not discussed in this paper.
+
+The goal of maneuvering rough terrain is achieved by a combination of 4 primary systems, namely, a mapping, 
+foot placement optimisation, motion controller and a \ac*{slam} system.
 \begin{figure}[h]
     \centering
     % \hspace{-1.38cm}
@@ -11,9 +35,8 @@ For a overview of the system, see Figure \ref{fig:system_diagram}. The hexapod t
     \label{fig:system_diagram}
 \end{figure}
 
-\noindent
 The mapping system utilises the \ac*{rgbd} camera to construct a dense heightmap of the immediate surroundings of the robot, as the robot moves around old data is erased to make
-way for new data. The size and resolution of the heightmap is adjustable to the available memory and computational power. The heightmp system is further covered in chapter \ref{chap:mapping}.
+way for new data. The size and resolution of the heightmap is adjustable to the available memory and computational power. The heightmap system is further covered in chapter \ref{chap:mapping}.
 
 The foot placement optimisation system takes the heightmap as input and produces another map of equal size to the heightmap, this new map is the score map and is found by assigning a score to each
 cell of the heightmap. The score is dependant on how stable of a place the cell would be for the robot to place its feet. The score map can then be used to evaluate, and adjust if necessary, the
