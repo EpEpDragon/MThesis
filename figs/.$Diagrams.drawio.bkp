@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-07-26T08:52:12.084Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.4 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="aH5sjxPPs69mRu13-ogu" version="24.6.4" type="device" pages="9">
+<mxfile host="Electron" modified="2024-07-26T08:52:35.542Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.4 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="93PswDUBQdVFn1Gemv_y" version="24.6.4" type="device" pages="9">
   <diagram name="Kinematics" id="6yCUUO-wR5nd1XfO6lML">
     <mxGraphModel dx="1367" dy="852" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="1" shadow="0">
       <root>
@@ -1078,7 +1078,7 @@
         </mxCell>
         <mxCell id="mkL81vRJ83U7fYKDZ0J7-23" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=0;fontFamily=Times New Roman;fontSize=15;fontColor=default;fillColor=none;gradientColor=none;" vertex="1" connectable="0" parent="mkL81vRJ83U7fYKDZ0J7-22">
           <mxGeometry x="0.3471" y="-1" relative="1" as="geometry">
-            <mxPoint x="2" y="-16" as="offset" />
+            <mxPoint x="-3" y="-16" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="mkL81vRJ83U7fYKDZ0J7-29" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Times New Roman;fontSize=15;fontColor=default;" edge="1" parent="1" source="mkL81vRJ83U7fYKDZ0J7-19" target="mkL81vRJ83U7fYKDZ0J7-28">

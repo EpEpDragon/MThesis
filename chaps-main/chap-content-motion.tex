@@ -323,7 +323,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
             d = L1 + L_2\sin{\theta_2} + L_3\sin{(\theta_2 + \theta_3)}
         \end{equation}
     
-    \subsection{Angular Rate}
+    \subsection{Angular Rate} \label{sec:ang_rate}
     To move a foot on a desired path it is important to not only know the absolute angle of the three leg servos, but also the angular rates of all three
     servos. If the servos are all moved at the same rate, the shape of the path that the foot follows will not be linear, but rather dependant on the
     current foot position. This is undesirable, thus equations \ref{eq:rate} define the derivative of the \ac{ik} equations (\ref{eq:ik}), i.e. the angular
