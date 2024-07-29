@@ -76,7 +76,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
         \bm{S}_{\bm{i} - \xi}=[i \text{ is even}]
     \end{equation}
     where \(\xi \in i\) is the active sextant/leg number, and,
-    \[i = [\![0..5]\!]\]
+    \[i = \seq{0}{1}{5}\]
 
     Figure \ref{fig:sextants} illustrates and example with sextant 1 being active. Thus legs 1, 3 and 5 are swinging, while legs 0, 2 and 4 are supporting.
     \begin{figure}[h]
@@ -146,7 +146,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
         \noindent
         The nominal targets in map space, \(\bm{t_\text{nom}} ^{\fmap}\), are calculated as in equation \ref{eq:t_map},
         \begin{equation} \label{eq:t_map}
-            \mdim{\boldsymbol{t}_\text{nom}^{\fmap}}{3}{6} = \bm{T}^\fbody + \left(l_\text{str}+|\bm{m}^\fbody|\right)\bm{w}_{dir}^\fbody \transframe{L}{M}
+            \mdim{\boldsymbol{t}_\text{nom}^{\fmap}}{3}{6} = \transframe{\bm{T}^\fbody + \left(l_\text{str}+|\bm{m}^\fbody|\right)\bm{w}_{dir}^\fbody}{\fbody}{\fmap}
         \end{equation}
         where \(\bm{T}^\fbody\) contains the constant rest positions the feet, \(l_\text{str}\) is the desired stride length, \(\bm{w}_\text{dir}^\fbody\)
         contains the desired walk directions. \(\avg\bm{m}^\fbody\) is the average move vector 
@@ -157,8 +157,7 @@ on entering the "Stepping" state. This function is described in section \ref{sec
             \mdim{\boldsymbol{t}_\text{nom}^\fbody}{3}{6} = \bm{T}^\fbody + l_{str}\bm{w}_\text{dir}^\fbody
         \end{equation}
 
-        Note that \(\bm{t}_\text{nom}^{\fmap}\) is quite similar to \(\bm{t}_\text{nom}^\fbody\), the difference is that, 
-        assuming the \transframe{M}{L} transform is applied, \(\bm{t}_\text{nom}^{\fmap}\) is set such that it
+        Note that \(\transframe{\bm{t}_\text{nom}^{\fmap}}{M}{L}\) is quite similar to \(\bm{t}_\text{nom}^\fbody\), the difference is that \(\bm{t}_\text{nom}^{\fmap}\) is set such that it
         will align with \(\bm{t}_\text{nom}^\fbody\)
         at the end of the step. Thus, the omission of the average supporting move vector, \(\avg \bm{m}^\fbody\), in calculating \(\bm{t}_\text{nom}^\fbody\)
         in equation \ref{eq:swing_nom}.
@@ -255,14 +254,14 @@ on entering the "Stepping" state. This function is described in section \ref{sec
             \caption{Body and leg coordinate frames.}
             \label{fig:coords_top}
         \end{figure}
-        The leg coordinate systems are simply rotated and shifted from the body coordinate system. This transformation,\transframenew{\bm{x}^\fbody, i}{\fbody}{\fleg} is defined by equation \ref{eq:body_to_leg},
+        The leg coordinate systems are simply rotated and shifted from the body coordinate system. This transformation,\transframe{\bm{x}^\fbody}{\fbody}{\fleg} is defined by equation \ref{eq:body_to_leg},
         \begin{equation}\label{eq:body_to_leg}
         \begin{split}
-            \bm{x}^\fleg &= \transframenew{\bm{x}^\fbody, i}{\fbody}{\fleg} \\
+            \bm{x}^\fleg &= \transframe{\bm{x}^\fbody}{\fbody}{\fleg} \\
             & = \bm{Q}_i^\fbody\cdot\bm{x}^\fbody\cdot\bm{Q}^{\fbody^{-1}}_{i} - \bm{R}_i
         \end{split}
         \end{equation}
-        where the  \(i\) is the index of the leg coordinate frame being transformed into, \(\bm{Q}_i^\fbody\) is the rotation of said coordinate frame and \(\bm{R}^\fbody_i\) is the root position of
+        where the \(\fleg\) is the coordinate frame of leg \(i\), \(\bm{Q}_i^\fbody\) is the rotation of said coordinate frame and \(\bm{R}^\fbody_i\) is the root position of
         said leg coordinate frame in the body coordinate frame. For more detail on this transformation, such as the values of \(\bm{Q}_i^\fbody\) and \(\bm{R}^\fbody_i\), please see
         appendix \ref{app:transforms}.
 

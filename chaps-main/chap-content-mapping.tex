@@ -32,12 +32,12 @@ that the image rotation has been corrected.
 Together the extrinsic and intrinsic matrices form the projection matrix,
 as shown in equation \ref{eq:projection_matrix},
 \begin{equation} \label{eq:projection_matrix}
-    \boldsymbol{P} = \boldsymbol{K}
+    \bm{P} = \bm{K}
     \begin{bmatrix}
-        \boldsymbol{R} & \boldsymbol{T}
+        \bm{R} & \bm{T}
     \end{bmatrix}
 \end{equation}
-where \(\boldsymbol{K}\) is the intrinsic matrix and \(\begin{bmatrix} \boldsymbol{R} & \boldsymbol{T} \end{bmatrix}\) the extrinsic matrix, these are described
+where \(\bm{K}\) is the intrinsic matrix and \(\begin{bmatrix} \bm{R} & \bm{T} \end{bmatrix}\) the extrinsic matrix, these are described
 in equation \ref{eq:intrinsic} and \ref{eq:extrinsic}.
 
 The projection matrix can be used to project a point on the image plane into world space as shown in equation \ref{eq:full_projection}.
@@ -48,7 +48,7 @@ The projection matrix can be used to project a point on the image plane into wor
         v \\
         1
     \end{bmatrix}
-    = \boldsymbol{P}
+    = \bm{P}
     \begin{bmatrix}
         x \\
         y \\
@@ -58,7 +58,7 @@ The projection matrix can be used to project a point on the image plane into wor
 \end{equation}
 where \(u,v\) are the pixel coordinates on the image plane and \(x,y,z\) are the coordinates in world space.
 \begin{equation} \label{eq:intrinsic}
-    \boldsymbol{K} =
+    \bm{K} =
     \begin{bmatrix}
         \alpha_x & \gamma   & u_0 \\
         0        & \alpha_y & v_0 \\
@@ -74,15 +74,15 @@ The skew coefficient, \(\gamma\), is often, and in this case, 0.
 The extrinsic matrix is as shown below,
 \begin{equation}\label{eq:extrinsic}
     \begin{bmatrix}
-        \boldsymbol{R} & \boldsymbol{T}
+        \bm{R} & \bm{T}
     \end{bmatrix}
     =
     \begin{bmatrix}
-        \boldsymbol{R}_{3\times3} & \boldsymbol{T}_{3\times1} \\
-        \boldsymbol{0}_{1\times3} & 1
+        \bm{R}_{3\times3} & \bm{T}_{3\times1} \\
+        \bm{0}_{1\times3} & 1
     \end{bmatrix}
 \end{equation}
-where \(\boldsymbol{R}\) characterises the camera's heading in world space and \(\boldsymbol{T}\) the world origin expressed in 
+where \(\bm{R}\) characterises the camera's heading in world space and \(\bm{T}\) the world origin expressed in 
 the camera coordinate frame.
 
 For ease of preprocessing points are first projected into the camera coordinate frame, in other words, the extrinsic matrix is omitted from equation \ref{eq:full_projection}.
@@ -115,7 +115,7 @@ From equation \ref{eq:local_projection} \(x,y,z\) are found to be show in equati
     x &= \frac{z(u - u_0)}{\alpha_x}\label{eq:proj_x} \\
     y &= \frac{z(v - v_0)}{\alpha_y}\label{eq:proj_y}
 \end{align}
-where \(I_{u,v}\) is the depth image value at pixel coordinates \(u,v\). For later use the variable \(\boldsymbol{p} \inrefframe{C}\) is defined as in equation \ref{eq:pcam},
+where \(I_{u,v}\) is the depth image value at pixel coordinates \(u,v\). For later use the variable \(\bm{p} \inrefframe{C}\) is defined as in equation \ref{eq:pcam},
 \begin{equation}\label{eq:pcam}
     \bm{p}\inrefframe{C}=
     \begin{bmatrix}
@@ -134,10 +134,10 @@ where \(I_{u,v}\) is the depth image value at pixel coordinates \(u,v\). For lat
         \label{fig:memory}
     \end{figure}
 
-    The heightmap buffer, \(\boldsymbol{M}\), is of size \(N \times N\) and is indexed by \(i,j\). In order to write the height value into the heightmap, the camera point in camera space,
-    \(\bm{p}\inrefframe{C}\), is translated into map space, \(\bm{p}\inrefframe{M}\), as shown in equation \ref{eq:project_to_map},
+    The heightmap buffer, \(\bm{M}\), is of size \(N \times N\) and is indexed by \(i,j\). In order to write the height value into the heightmap, the camera point in camera space,
+    \(\bm{p}\inrefframe{\fcamera}\), is translated into map space, \(\bm{p}\inrefframe{\fmap}\), as shown in equation \ref{eq:project_to_map},
     \begin{equation} \label{eq:project_to_map}
-        \boldsymbol{p}\inrefframe{M} = \boldsymbol{p}\inrefframe{C} \transframe{C}{M}
+        \bm{p}\inrefframe{\fmap} = \transframe{\bm{p}\inrefframe{\fcamera}}{\fcamera}{\fmap}
     \end{equation}
     see appendix \ref{app:transforms} for transformation definitions.
 

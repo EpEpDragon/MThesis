@@ -3,7 +3,7 @@
 
 \begin{Nomencl}[2.75cm]
 \NomGroup{Constants}%-----------------------------------------------
-    \item[$L_0 = $] \qty{300}{mm}
+    \item[$L_0$] \qty{300}{mm}
 
 \NomGroup{Variables}%-----------------------------------------------
     \item[$\mathit{Re}_\mathrm{\,D}$]
@@ -15,22 +15,25 @@
     \item[$\tau$]      \UnitLine{Moment                    }{\newton\meter}
 
 \NomGroup{Vectors and Tensors}%-------------------------------------
-    \item[$\overrightarrow{\bm{v}}$] Physical vector, see equation ...
+
 
 \NomGroup{Subscripts}%----------------------------------------------
     \item[$\mathrm{a}$] Adiabatic
     \item[$a$]          Coordinate
+\NomGroup{Superscripts}%----------------------------------------------
+    \item[\fworld] Indicates the world reference frame.\footnote{\label{note1}See appendix \ref{app:frames} for reference frame definitions.}
+    \item[\fbody] Indicates the robot body reference frame.\textsuperscript{\ref{note1}}
+    \item[\fmap] Indicates the map reference frame.\textsuperscript{\ref{note1}}
+    \item[\fcamera] Indicates the camera reference frame.\textsuperscript{\ref{note1}}
+    \item[\fleg] Indicates the reference frame of leg \(i\).\textsuperscript{\ref{note1}}
 
-% 
+\newpage
 \NomGroup{Notation}
-    % \setlength{\itemindent}{1cm}
-    \item[\(\seq{a_0}{a_1}{a_n}\)] Defines a integer sequence from \(a_0\) to \(a_n\), with a increment of \(a_1-a_0\).
-    \item[\(x\inrefframe{A}\)] Indicates that \(x\) is in reference frame \(\mathcal{A}\).
-    \item[\(\transframenew{x}{\refframe{A}}{\refframe{B}}\)] Transforms \refframe{A} to reference frame \refframe{B},\footnote{See appendix \ref{app:transforms} for transform definitions.}
-    \item[\(\mathcal{W}\)] Indicates the world reference frame.\footnote{\label{note1}See appendix \ref{app:frames} for reference frame definitions.}
-    \item[\(\mathcal{L}\)] Indicates the local reference frame.\textsuperscript{\ref{note1}}
-    \item[\(\mathcal{M}\)] Indicates the map reference frame.\textsuperscript{\ref{note1}}
-    \item[\(\mathcal{C}\)] Indicates the camera reference frame.\textsuperscript{\ref{note1}}
+    \item[\(x\inrefframe{A}\)] Indicates that \(x\) is in reference frame \refframe{A}.
+    \item[\(\transframe{x}{\refframe{A}}{\refframe{B}}\)] Transforms \refframe{A} to reference frame \refframe{B}.\footnote{See appendix \ref{app:transforms} for transform definitions.}
+    \item[\(\seq{a_0}{a_1}{a_n}\)] Defines a integer sequence from \(a_0\) to \(a_n\), with a increment of 1.
+    \item[\(\langle \bm{a}, \bm{b} \rangle_F\)] Takes the Frobenius inner product of matrix \(\bm{a}\) and \(\bm{b}\).
+
 % \NomGroup{Abreviations}%-----------------------------------------------
 %     \begin{acronym}[MMIIII]
 %         \item \acro{ik}[IK]{Inverse Kinematics}
