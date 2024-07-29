@@ -20,10 +20,10 @@ deviation in terrain height is present. Thus the proposed, more advanced system,
 \end{figure}
 
 \noindent
-The advanced system uses similar components from the basic system, although theses basic components have difference that will be discussed in
-later chapters, but incorporates checks against a heightmap to validate, and, if necessary, adjust the nominal foot end positions and paths to
-move the feet to said positions. If the nominal positions are invalid and no valid adjustment can be made the robot will have to change
-its overall path, however this is not discussed in this paper.
+The advanced system uses similar components from the basic system, with some differences discussed in
+later chapters, but additionally incorporates checks against a heightmap and a score map to validate, and if necessary, adjust the nominal foot 
+end positions and paths to move the feet to said positions. If the nominal positions are invalid and no valid adjustment can be made the 
+robot will have to change its overall path, however this is not discussed in this paper.
 
 The goal of maneuvering rough terrain is achieved by a combination of 4 primary systems, namely, a mapping, 
 foot placement optimisation, motion controller and a \ac*{slam} system. A high level overview of the system implementation can be seen

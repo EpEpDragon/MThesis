@@ -1,7 +1,7 @@
 \chapter{List of symbols}
 % Use stb-nomenclature + siunitx
 
-\begin{Nomencl}[1cm]
+\begin{Nomencl}[2.75cm]
 \NomGroup{Constants}%-----------------------------------------------
     \item[$L_0 = $] \qty{300}{mm}
 
@@ -21,37 +21,49 @@
     \item[$\mathrm{a}$] Adiabatic
     \item[$a$]          Coordinate
 
+% 
 \NomGroup{Notation}
+    % \setlength{\itemindent}{1cm}
     \item[\(\seq{a_0}{a_1}{a_n}\)] Defines a integer sequence from \(a_0\) to \(a_n\), with a increment of \(a_1-a_0\).
     \item[\(x\inrefframe{A}\)] Indicates that \(x\) is in reference frame \(\mathcal{A}\).
-    \item[\(x\transframe{A}{B}\)] Transforms \(x\inrefframe{A}\) to reference frame \(\mathcal{B}\),\footnote{See appendix \ref{app:transforms} for transform definitions.} 
-    such that the resultant point in global space stays constant, meaning, \(\left[x\inrefframe{A}\transframe{A}{B}\right]\inrefframe{B}\)
+    \item[\(\transframenew{x}{\refframe{A}}{\refframe{B}}\)] Transforms \refframe{A} to reference frame \refframe{B},\footnote{See appendix \ref{app:transforms} for transform definitions.}
     \item[\(\mathcal{W}\)] Indicates the world reference frame.\footnote{\label{note1}See appendix \ref{app:frames} for reference frame definitions.}
     \item[\(\mathcal{L}\)] Indicates the local reference frame.\textsuperscript{\ref{note1}}
     \item[\(\mathcal{M}\)] Indicates the map reference frame.\textsuperscript{\ref{note1}}
     \item[\(\mathcal{C}\)] Indicates the camera reference frame.\textsuperscript{\ref{note1}}
-    
+% \NomGroup{Abreviations}%-----------------------------------------------
+%     \begin{acronym}[MMIIII]
+%         \item \acro{ik}[IK]{Inverse Kinematics}
+%         \acro{fk}[FK]{Forward Kinematics}
+%         \acro{sdf}[SDF]{Signed Distance Field}
+%         \acro{mujoco}[MuJoCo]{Multi-Joint dynamics with Contact}
+%         \acro{gui}[GUI]{Graphical User Interface}
+%         \acro{ros}[ROS]{Robot Operating System}
+%         \acro{lidar}[LiDAR]{Light Detection and Ranging}
+%         \acro{rgbd}[RGB-D]{Red Green Blue Depth}
+%         \acro{slam}[SLAM]{Simultaneous Localisation and Mapping}
+%         \acro{imu}[IMU]{Inertial Measuring Unit}
+%         \acro{rl}[RL]{Reinforcement Learing}
+%         \acro{ann}[ANN]{Artificial Neural Network}
+%         \acro{gps}[GPS]{Global Positioning System}
+%     \end{acronym}    
 \end{Nomencl}
 
-% \begin{Nomencl}[1cm]
-% \NomGroup{Abreviations}%-----------------------------------------------
-    % \item[DEM] Discrete Element Method
-    % \item[FEA] Finite Element Analysis
-    \begin{acronym}[MMIIII]
-    \NomGroup{Abreviations}%-----------------------------------------------
-        \acro{ik}[IK]{Inverse Kinematics}
-        \acro{fk}[FK]{Forward Kinematics}
-        \acro{sdf}[SDF]{Signed Distance Field}
-        \acro{mujoco}[MuJoCo]{Multi-Joint dynamics with Contact}
-        \acro{gui}[GUI]{Graphical User Interface}
-        \acro{ros}[ROS]{Robot Operating System}
-        \acro{lidar}[LiDAR]{Light Detection and Ranging}
-        \acro{rgbd}[RGB-D]{Red Green Blue Depth}
-        \acro{slam}[SLAM]{Simultaneous Localisation and Mapping}
-        \acro{imu}[IMU]{Inertial Measuring Unit}
-        \acro{rl}[RL]{Reinforcement Learing}
-        \acro{ann}[ANN]{Artificial Neural Network}
-        \acro{gps}[GPS]{Global Positioning System}
-    \end{acronym}    
-% \end{Nomencl}
-
+\subsubsection*{Abbreviations}
+    \hfill\begin{minipage}{\dimexpr\textwidth-\NomLblSep}
+        \begin{acronym}[MMMMMMii]
+            \acro{ik}[IK]{Inverse Kinematics}
+            \acro{fk}[FK]{Forward Kinematics}
+            \acro{sdf}[SDF]{Signed Distance Field}
+            \acro{mujoco}[MuJoCo]{Multi-Joint dynamics with Contact}
+            \acro{gui}[GUI]{Graphical User Interface}
+            \acro{ros}[ROS]{Robot Operating System}
+            \acro{lidar}[LiDAR]{Light Detection and Ranging}
+            \acro{rgbd}[RGB-D]{Red Green Blue Depth}
+            \acro{slam}[SLAM]{Simultaneous Localisation and Mapping}
+            \acro{imu}[IMU]{Inertial Measuring Unit}
+            \acro{rl}[RL]{Reinforcement Learing}
+            \acro{ann}[ANN]{Artificial Neural Network}
+            \acro{gps}[GPS]{Global Positioning System}
+        \end{acronym}       
+    \end{minipage}
