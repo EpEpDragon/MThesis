@@ -52,7 +52,9 @@ Walking over rough terrain requires a control system to correctly actuate the he
     \ac{rl} controllers are created through using trial and error to construct a neural net that minimises a cost function for a specific goal. This theoretically allows \ac{rl} controllers to adapt to any circumstances given enough time, allowing a very hight level of autonomy, as no prior direction is required. \ac{rl} controllers are though notoriously difficult to train properly, especially when the amount of sensors and control outputs grow large, increasing the feature space. And event he most well trained \ac{rl} agent still has the possibility to exhibit inexplicable behaviour.
     
 \section{Sensing Methods}
-    No matter the control scheme used, to know where to place its feet the robot requires sensor(s) to sense its environment in some way, this could be achieved through simple sensors such as servo torque or touch. More advanced methods such as vision or \ac{lidar} are also used. \cite{homberger2017terrain} use stereoscopic vision to adjust end effector height and to classify surface materials.
+    No matter the control scheme used, to know where to place its feet the robot requires sensor(s) to sense its environment in some way,
+    this could be achieved through simple sensors such as servo torque or touch. More advanced methods such as vision or \ac{lidar} are also used.
+    \cite{homberger2017terrain} uses stereoscopic vision to adjust end effector height and to classify surface materials.
 
     Depending on the terrain navigation system it might be required to localise the robot in 3D space, for this it is possible to use external sensors such as a type of beacon (RF, Reflective, Ultrasonic), \ac{gps} or, through the use of a \ac{slam} system, internal sensors such as vision could be used.
 
@@ -75,16 +77,59 @@ Walking over rough terrain requires a control system to correctly actuate the he
 
 \section{Simulation Environment}
 
-The most popular physics simulators for robotics in recent times are Gazebo, \ac{mujoco} and CoppeliaSim (previously V-REP) \citep{Collins-2021}. Gazebo and CoppeliaSim both have easy to use \ac{gui} interfaces and easy integration with \ac{ros}. \ac{mujoco} on the other hand does not have a full \ac{gui} interface, only a simulation viewer, and does not have native \ac{ros} integration. Having said this \ac{mujoco} was found to be the most accurate and fastest simulator when considering the use case of robotics \citep{Erez-2015}.
+The most popular physics simulators for robotics in recent times are Gazebo, \ac{mujoco} and CoppeliaSim (previously V-REP) \citep{Collins-2021}.
+Gazebo and CoppeliaSim both have easy to use \ac{gui} interfaces and easy integration with \ac{ros}. \ac{mujoco} on the other hand does not have
+a full \ac{gui} interface, only a simulation viewer, and does not have native \ac{ros} integration. Having said this \ac{mujoco} was found to be
+the most accurate and fastest simulator when considering the use case of robotics \citep{Erez-2015}.
 
-\section{Related Works}
-\textcolor{red}{TODO}
+\section{Uneven Terrain}
+    As hexapods are inherently stable, they are good candidates for use in uneven terrain, and this tends to be where much hexapod research is focused.
+    Such as in \cite{homberger2017terrain}, which uses a stereoscopic camera to extract features and classify terrain by factors such as material type,
+    slope and granularity. These parameters are then used to classify various gait parameters, such as step height and dampening, to improve stability while
+    walking.
+
+    This is similar to \cite{Xu2023Learning}, which aims to
+    classify terrain based on material properties, however, \cite{Xu2023Learning} focuses on characterising terrain through touch sensors instead of visual sensors.
+    This is achieved through the use of machine learning.
+    
+    Moving away from gait optimisations and local terrain classification, \cite{Prágr2019Online} aims to characterize
+    large areas of terrain in terms of navigational efficiency through the use of gaussian processes and a incrementally constructed spatial map.
+    An example of this exploratory traversability classification can be seen in figure \ref{fig:cite_pragr}.
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.7\textwidth]{cite_Pragr.jpg}
+        \caption{Exploratory terrain traversability classification from \citep{Prágr2019Online}}
+        \label{fig:cite_pragr}
+    \end{figure}
+
+    \newpage
+    \noindent
+    While this paper is on hexapods, it should be noted that much work has also been done on quadrupeds. For example \cite{Mastalli2020Motion} uses various sensors
+    to assign a cost to surrounding terrain, thus constructing a cost map, this cost map is then used to select optimal foot end positions for the next step. This can be seen in
+    figure \ref{fig:cite_quadruped_walk}.
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{cite_quadruped_score_map.jpg}
+        \caption{Quadruped terrain scoring and navigation from \citep{Mastalli2020Motion}}
+        \label{fig:cite_quadruped_walk}
+    \end{figure}
+    Of course, being a quadruped, in addition to finding optimal foot end positions, significant consideration had to be given to maintaining the stability of the robot,
+    something that is much less of a concern with hexapods.
 
 \section{Research Decisions}
-This research paper focuses on using vision based mapping to select the optimal anchor points for end effectors, thus it was decided that traditional kinematic control is used as it is the simplest and most predictable method of control.
+    This research paper focuses on using vision based mapping, terrain classification and the optimisation of foot end positions, thus it was decided that
+    traditional kinematic control is used as it is the simplest and most predictable method of control. Thus allowing the focus to remain on terrain
+    classification and foot end position optimisation.
 
-The camera that is used is the Intel Realsense D435i \ac{rgbd} camera, incorporating stereoscopic cameras and a \ac{lidar} sensor. This camera also has a extensive existing codebase and support that ensures accurate depth readings are attained.
+    The camera that is used is the Intel Realsense D435i \ac{rgbd} camera, incorporating stereoscopic cameras and a \ac{lidar} sensor.
+    This camera also has a extensive existing codebase and support that ensures accurate depth readings are attained.
 
-A system to localise the robot within its environment is required, as the primary sensor used is an \ac{rgbd} camera, various visual \ac{slam} systems were considered. ORB-SLAM 3, a optimisation-based, sparse map \ac{slam} system was chosen to be used. ORB-SLAM 3 maintains a sparse map, an atlas, of both active and dormant features. This atlas is used to localise in the sparse map \citep{macario2022comprehensive}. The implementation of a dense map to be used for end effector placement is discussed in \autoref{chap:mapping}. \textcolor{red}{Compare this more to others?}
+    A system to localise the robot within its environment is required, as the primary sensor used is an \ac{rgbd} camera, various visual
+    \ac{slam} systems were considered. ORB-SLAM 3, a optimisation-based, sparse map \ac{slam} system was chosen to be used. ORB-SLAM 3 maintains
+    a sparse map, an atlas, of both active and dormant features. This atlas is used to localise in the sparse map \citep{macario2022comprehensive}.
+    The implementation of a dense map to be used for end effector placement is discussed in \autoref{chap:mapping}.
+    \textcolor{red}{Compare this more to others?}
 
-Finally a simulation environment was chosen. Considering that the only relevant downside to \ac{mujoco} is the lack of native \ac{ros} integration and the lack of a comprehensive \ac{gui}, which seeing as \ac{mujoco} has good python bindings, could be seen as a advantage, \ac{mujoco} was chosen as the simulator.
+    Finally a simulation environment was chosen. \ac{mujoco} has exceptional contact physics simulation and the only relevant
+    downside is the lack of native \ac{ros} integration and the lack of a comprehensive \ac{gui}, which seeing as \ac{mujoco} has good python bindings,
+    could be seen as a advantage. Considering this, \ac{mujoco} was chosen as the simulator.

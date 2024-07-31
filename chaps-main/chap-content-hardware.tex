@@ -125,7 +125,7 @@ Further detail pertaining to communication using \ac{ros} is provided in section
             \centering
             \begin{tabularx}{\textwidth}{| l | l | X |}
                 \hline
-                \multicolumn{3}{|c|}{\textbf{Jetson Subscribers}} \\ \hline
+                \multicolumn{3}{|c|}{\textbf{Teensy subscribers}} \\ \hline
                 \textbf{Name} & \textbf{Data Type} & \textbf{Description} \\ \hline
                 % walk\_dir & Description & Data Type & Frequency \\ \hline
                 command\_data & HexapodCommands & The color image from the \ac{rgbd} camera. \\ \hline
@@ -213,7 +213,7 @@ Further detail pertaining to communication using \ac{ros} is provided in section
     While threads can directly communicate with each other within the same workgroup, direct communication across workgroups is
     impossible. If cross workgroup communication is desired, this must be performed using \ac{gpu} buffers, which are slower to access. Thus processes are
     designed to operate fully independently from each other. Of course, data transfer between the \ac{cpu} and the \ac{gpu} is orders of magnitudes
-    slower than accessing local buffers, as such, all \ac{cpu}, \ac{gpu} is kept to a minimum.
+    slower than accessing local buffers, as such, all \ac{cpu}, \ac{gpu} communication is kept to a minimum.
     
     Finally it should be noted that while it is possible to vary \(\bm{s_w}\) with each execution cycle, \(\bm{S_l}\) is a constant specified at compile time,
     and as such the number of threads per workgroup cannot be altered during operation.
