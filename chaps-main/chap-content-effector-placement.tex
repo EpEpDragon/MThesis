@@ -1,23 +1,29 @@
 \chapter{Foot Placement Optimisation} \label{chap:optimisation}
-The best possible anchor points for the supporting feet, given an initial point from the walking
-gait state machine, must be found based on the heightmap. This is done by applying various
-scores to the heightmap and selecting a point with the best score within an allowable
-deviation from the initial point received from the gait state machine.
+This chapter describes the processes necessary for optimising the foot end positions, starting by describing the method of scoring the heightmap generated in
+chapter \ref{chap:mapping}. Next a semi radial search algorithm for use in locating the position with the best score. Finally the process of choosing a reference
+floor height based on the terrain is described.
+\section{Overview}
+    The best possible anchor points for the supporting feet, given an initial point from the walking
+    gait state machine, must be found based on the heightmap. This is achieved by assigning a walkability score to each cell in the heightmap based on the
+    cells slope and its proximity to edges.
+
+    To find the first, best foot end position relative to the nominal foot end position, a semi radial search algorithm is used
+
+    Finally, since the robot will be walking over terrain it is required to adjust its reference for the floor height.
 
 \section{Scoring} \label{sec:scores}
-    The scores considered are the gradient and proximity scores. The gradient score aims to reject points with high gradients while the proximity score rejects points close
+    The scores considered are the slope and proximity scores. The slope score aims to reject points with high slopes while the proximity score rejects points close
     to other parts of the terrain with steep inclines, i.e. to reject points inside holes or close to ledges.
-    \subsection{Gradient Score}
-        The gradient score is simply taken as the slope of the terrain at the current point. The aim of this score is to prevent the robot from slipping due to
-        selecting anchor points with too steep of a gradient.
+    \subsection{Slope Score}
+        The slope score is simply taken as the slope of the terrain at the current point. The aim of this score is to prevent the robot from slipping due to
+        selecting anchor points with too steep of a slope.
         
-        As the heightmap slope is not defined by a known function, the gradient is calculated using the Sobel
+        As the heightmap slope is not defined by a known function, the slope is calculated using the Sobel
         operator (\cite{sobel2014}), a combination of a central finite difference and a smoothing operator.
-        \newpage
-        \noindent
+
         Equation \ref{eq:sobelgx} and \ref{eq:sobelgy} describe the two separable x and y direction kernels, \(G_x\) and \(G_y\),
         of the Sobel operator. These kernels are a combination of central finite difference and smoothing operator, see Appendix \ref{app:sobel} 
-        for a breakdown. Equation \ref{eq:sobelsg} combines \(G_x\) and \(G_y\) to produce the gradient score, \(S_g\). Note that these equations represent
+        for a breakdown. Equation \ref{eq:sobelsg} combines \(G_x\) and \(G_y\) to produce the slope score, \(S_g\). Note that these equations represent
         a single scalar result of the Sobel operator using the Frobenius inner product, \cite{horn2012matrix}. If evaluated over the whole heightmap this is equivalent
         to convolution.
         \begin{align}
@@ -55,17 +61,17 @@ deviation from the initial point received from the gait state machine.
         \[i = \big[\mkern-4.7mu\big[x-1,\mkern2mu x+1\big]\mkern-4.7mu\big]\]
         \[j = \big[\mkern-4.7mu\big[y-1,\mkern2mu y+1\big]\mkern-4.7mu\big]\]
         \noindent
-        with \(C_g\) being the weighting constant associated with the gradient score, \(S_g\).
+        with \(C_g\) being the weighting constant associated with the slope score, \(S_g\).
         
         \captionsetup[figure]{oneside,margin={0.9cm,0cm}}
         \begin{figure}[h]
             \centering
-            \includegraphics{slope_score.pdf}
+            \includegraphics[clip, trim=0 0.25cm 0 0]{slope_score.pdf}
             \caption{Slope Score}
             \label{fig:slope_score}
         \end{figure}
 
-    \subsection{Terrain Proximity Score}
+    \subsection{Edge Proximity Score}
     The proximity score aims to bias the selected anchor point away from points near steep inclines in the terrain. This score is defined as the average of the height
     difference of the current point weighted by the gaussian kernel \(\boldsymbol{K}\), of size \(n\) by \(n\). The distance around inclines that is rejected depends on the the
     chosen size of the kernel \(\boldsymbol{K}\), the standard deviation of \(\boldsymbol{K}\) and the height differences. This score is described in Equation
@@ -91,7 +97,7 @@ deviation from the initial point received from the gait state machine.
     \captionsetup[figure]{oneside,margin={0.9cm,0cm}}
     \begin{figure}[h]
         \centering
-        \includegraphics{prox_score.pdf}
+        \includegraphics[]{prox_score.pdf}
         \caption{Proximity Score Diagrammatic Representation}
         \label{fig:prox_score_diagram}
     \end{figure}
@@ -150,3 +156,10 @@ deviation from the initial point received from the gait state machine.
     without any feet positioned on it, then the robot will not adjust its body height to clear this piece of terrain. 
     Thus, the bounding box of the robots body, excluding the legs and feet, is checked against the heightmap
     and if anywhere in the bounding box is higher than the previously set floor height, the floor height is adjusted to this new value.
+
+
+\bigskip
+\bigskip
+\hrule
+\smallbreak
+\hrule

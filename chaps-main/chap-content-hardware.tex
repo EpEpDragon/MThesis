@@ -1,10 +1,14 @@
 \chapter{Hardware Implementation} \label{chap:hardware}
-This chapter describes the process of implementing the system built in previous chapters on the physical robot using \ac{ros} and parallel computation.
-% \ac{ros} is used 
-% for the hardware implementation, first the \ac{ros} data types are defined, after which the control and analysis system running on the base station
-% is described. Next the systems running on board the robot are described.
+This chapter describes the hardware implementation, starting with a description of the \ac{ros} nodes in section \ref{sec:ros_nodes},
+after which in section \ref{sec:ros_comms} the rost communication protocols are described.
 
-\section{ROS Nodes}
+\section{Overview}
+The entire system in implemented using \ac{ros}, which is a system which, among other things, greatly simplifies the task of
+communication between devices using various different communication protocols. This is achieved by sectioning all code into different
+\ac{ros} nodes, where every node is treated a component in a large network. All ros nodes are joined together by the core node,
+which is hosted at a set IP address on the network.
+
+\section{ROS Nodes} \label{sec:ros_nodes}
 There are various ros nodes spread out across the base station, the Jetson Nano and the Teensy \ac{mcu}, figure \ref{fig:nodes} provides and overview
 of the nodes and how they communicate with each other. Section \ref{sec:base_ros} and \ref{sec:on_board_ros} go into detail on the publishers and subscribers
 on board the robot and on the base station. Figure \ref{fig:nodes} provides and overview of the \ac{ros} nodes and communication used to construct the system.
@@ -163,63 +167,3 @@ Further detail pertaining to communication using \ac{ros} is provided in section
             \caption{\ac{ros} data type descriptions}
             \label{tab:data_types}
         \end{table}
-
-\newpage
-\section{GPU Compute Pipeline}
-    As the heightmap generation and heightmap scoring systems are essentially image manipulation processes, parallelisation of the algorithms
-    is a very efficient way to increase computational speeds, thus, these algorithms are run in parallel on the Jetson nano's \ac{gpu} using OpenGL
-    compute shaders. This section describes the compute pipeline used to build and score the heightmap. The \ac{gpu} pipeline can be seen in
-    figure \ref{fig:compute_pipe}.
-    \captionsetup[figure]{oneside,margin={0cm,0cm}}
-    \begin{figure}[h]
-        \centering
-        \includegraphics{Diagrams-ComputePipeline.drawio.pdf}
-        \caption{Compute pipeline.}
-        \label{fig:compute_pipe}
-    \end{figure}
-
-    \noindent
-    As seen from figure \ref{fig:compute_pipe} the \ac{gpu} pipeline is relatively simple, being comprised of only two stages, the heightmap generation
-    stage and the heightmap processing stage. The heightmap generation stage executes for each pixel on the depth image, constructing the heightmap as 
-    described in chapter \ref{chap:mapping}.
-    
-    After the heightmap has been generated, the heightmap processing stage operates over the heightmap buffer. This stage has two tasks, to erase the
-    old height data as the robot walks around, and to generate the score map, as described in section \ref{sec:scores}.
-    
-    \subsection{A note on \ac{gpu} architecture}
-    A process on a \ac{gpu} operates fully in parallel and the \ac{gpu} is highly optimised for parallelisation, thus there is a very specific
-    execution structure that a \ac{gpu} process abide by to perform at maximum efficiency, or to even function at all. This execution structure is
-    as follows.
-    
-    When writing compute code a 3D size is specified, the localgroup size, \(\bm{N}_{l} = [X_l,Y_{l},Z_{l}]\), next when the \ac{cpu} dispatches
-    a compute task, the workgroup count, is fed as parameter, \(\bm{n}_{w} = [x_{w},y_{w},z_{w}]\). The \ac{gpu} then initialises
-    \(\bm{n}_w\) workgroups, and each workgroup initialises \(\bm{N}_l\) threads. These threads are grouped into warps, or waves, which, depending on the architectures processor count,
-    can be either 32 or 64 threads. To ensure maximum efficiency it is important that \(\bm{N}_l\) is divisible by the warp size.
-    Originally Nvidia \ac{gpu}s utilised a warp size of 32 and AMD 64, however with AMDs latest RDNA architecture, the warp size could be either 32 or 64.
-    This system assumes a warp size of 32.
-    
-    For the heightmap generation stage \(\bm{N}_{l} = [32,32,0]\) for a total of 1024 threads per workgroup, or in other words, 32 warps per workgroup.
-    As for the heightmap processing stage, \(\bm{N}_{l} = [32,32,32]\), meaning 32768 threads, or 1024 warps per workgroup.
-    As such it is important that camera images, the heightmap and the score map are of a size divisible by 32.
-    % A basic diagram of this execution scheme can be seen in figure \ref{fig:gpu_scheme}.
-    % \begin{figure}[h]
-    %     \centering
-    %     \includegraphics{Diagrams-ComputePipeline.drawio.pdf}
-    %     \caption{GPU execution scheme.}
-    %     \label{fig:gpu_scheme}
-    % \end{figure}
-
-    % \noindent
-    While threads can directly communicate with each other within the same workgroup, direct communication across workgroups is
-    impossible. If cross workgroup communication is desired, this must be performed using \ac{gpu} buffers, which are slower to access. Thus processes are
-    designed to operate fully independently from each other. Of course, data transfer between the \ac{cpu} and the \ac{gpu} is orders of magnitudes
-    slower than accessing local buffers, as such, all \ac{cpu}, \ac{gpu} communication is kept to a minimum.
-    
-    Finally it should be noted that while it is possible to vary \(\bm{s_w}\) with each execution cycle, \(\bm{S_l}\) is a constant specified at compile time,
-    and as such the number of threads per workgroup cannot be altered during operation.
-
-\bigskip
-\bigskip
-\hrule
-\smallbreak
-\hrule
