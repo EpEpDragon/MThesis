@@ -1,0 +1,7 @@
+        Fill in temp figures-----------
+        Improve System overview----------- Finished
+p21     Coord frame figures----------- 
+p38.    Fix ROS nodes fig-----------
+        Finish results chapter----------- In Progress
+        Finish conclusion-----------
+AppA    Write body to leg transform-----------

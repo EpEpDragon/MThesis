@@ -1,12 +1,6 @@
 \chapter{Results}
 
-\section{Requirements}
-
-\section{Depth Camera}
-
-\section{Heightmap}
-
-\section{Walkability Scores}
+\section{Walkability Scores} \label{sec:test_scores}
     For testing the walkability scores described in section \ref{sec:scores}, a piece of terrain that demonstrates various types of obstacles
     that the robot might encounter was chosen, this terrain and its heightmap is shown in figure \ref{fig:score_test_map}.
     \begin{figure}[h]
@@ -79,8 +73,21 @@
     The flat surfaces on the pillar an in the hole are large enough to not be rejected by the edge proximity score, however, if the inclines sere steeper or the flat surface smaller it is possible that these nominal positions would be
     unsolvable, as there is no appropriate foot end placement inside the search radius. In this case the robot would need to make a course adjustment.
 
+\section{Hardware Heightmap and Scoremap}
+    The mapping test aims to show how the physical hexapod maps various objects while in motion. The test consists of the robot walking past the
+    various obstacles, while simultaneously generating a heightmap. Subsequently the score map is also generated. 
+    Finally, similar to section \ref{sec:test_scores}, various nominal foot positions are optimised using this score map.
+    
+    Figure \ref{fig:hardware_map_diag} shows a top-down diagram of the placed obstacles used in this test, with the path the robot walks.
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=.6\textwidth]{hardware_mapping_test_diagram.jpg}
+        \caption{Top-down diagram of the test setup.}
+        \label{fig:hardware_map_diag}
+    \end{figure}
+
 \newpage
-\section{Walking}
+\section{Terrain Navigation}
     The final walking tests are comprised of three different terrains, a simple flat plane as a baseline, then a staircase to demonstrate simple foot and body height adjustment and
     finally a uneven organic like surface.
     
@@ -176,8 +183,8 @@
     adjusted in the horizontal plane, the step arcs are appropriately adjusted and remain relatively smooth, similar to the flat plane test.
 
 
-\bigskip
-\bigskip
-\hrule
-\smallbreak
-\hrule
+% \bigskip
+% \bigskip
+% \hrule
+% \smallbreak
+% \hrule
