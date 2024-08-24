@@ -56,6 +56,7 @@
                 \label{fig:kinematics}
             \end{figure}
 
+        \newpage
         \subsection{\acf{ik}}
             The \ac{ik} function calculates the leg servo angles, \(\bm{\Theta} = [\Theta_1, \Theta_2, \Theta_3]^T_{\displaystyle ,}\) required
             to move the foot to the given target position vector, \(\bm{t} = [x_t,y_t,z_t]^T_{\displaystyle .}\)
@@ -104,6 +105,7 @@
                 d = L1 + L_2\sin{\theta_2} + L_3\sin{(\theta_2 + \theta_3)}
             \end{equation}
         
+        \newpage
         \subsection{Angular Rate} \label{sec:ang_rate}
             To move a foot on a desired path it is important to not only know the absolute angle of the three leg servos, but also the angular rates of all three
             servos. If the servos are all moved at the same rate, the shape of the path that the foot follows will not be linear, but rather dependant on the
@@ -133,53 +135,115 @@
             \end{align}
     
     \newpage
-    \section{Gait State Machine}
-        The state machine used to realise the tripod gait used in the robot is quite simple, comprised of only two states, stepping and
-        resting, as can be seen from figure \ref{fig:gaitSM}. Table \ref{tab:state_defs} defines the actions that should be taken during
-        each state.
-
-        The primary computation done by this state machine is calculating which legs are supporting and which are swinging, which occurs
-        on entering the "Stepping" state. This function is described in section \ref{sec:supp_swing_calc}.
-
+    \section{Walking Gait}
+        To move the hexapod must support its body with some of its legs while the remaining legs swing towards their new targets,
+        at which point the swinging legs become the new supporting. The sequence in which the legs support and swing is called the walking gait.
+        Figure \ref{fig:gait_patterns} shows three different gait patterns that can be used with a hexapod, the wave ripple and tripod gait \citep{Darbha2017AnOS}.
+        The dark cell represents a swinging leg and the light cell a supporting leg.
         \begin{figure}[h]
             \centering
             % \hspace{-1.38cm}
-            \includegraphics{Diagrams-GaitSM.drawio.pdf}
-            \caption{Gait State Machine}
-            \label{fig:gaitSM}
+            \includegraphics{Diagrams-GaitDiagram.drawio.pdf}
+            \caption{Three hexapod gait patterns.}
+            \label{fig:gait_patterns}
         \end{figure}
 
-        \begin{table}[h]
-            \center
-            \begin{tabularx}{\textwidth}{|l|X|}
-                \hline
-                \multicolumn{2}{|c|}{Rest State Definition} \\
-                \hline
-                Enter Condition & Has all feet reached their targets? \\
-                \hline
-                On Entering & Set all leg states as supporting. \\
-                \hline
-                While Active & Do nothing \\
-                \hline
-            \end{tabularx}
-            
-            \bigskip
+        \noindent
+        The wave gait moves one leg at a time while supporting with the remaining 5, the ripple gait moves two legs at a time, and the tripod moves
+        three legs at a time.
+
+        The speed of the hexapod is based on the parameters of the gait, specifically as described in equation \ref{eq:speed},
+        \begin{equation} \label{eq:speed}
+            v = \frac{S}{D\tau}
+        \end{equation}
+        where \(S\) is the stride length, \(tau\) is the gait period and \(D\) is the duty factor. \(D\) is defined as the time a leg is in the support phase relative to its swing phase.
+        The wave, ripple and tripod gaits have a duty factor of \(\frac{5}{6}\), \(\frac{2}{3}\) and \(\frac{1}{2}\) respectively.
+        
+        From this it is clear that the wave gait is the slowest while the tripod gait is the fastest, and the ripple gait is in between.
+        It should however be noted the gait's stability is inverse to their speed.
+
+        The gait that will be used in this system is the tripod gait, which is the most common gait for hexapods as it supports with three legs, while maximising speed. Even though this is less stable than
+        the wave and ripple gaits, it does maintain natural stability with three contact points, which is adequate for most circumstances.
+
+        \subsection{Stride Reference Frame}
+            When describing the stride of the robot it is important to note which reference frame is being used. Figure \ref{fig:stride_body} shows
+            the stride of a tripod gait in the body reference frame, \(\fbody\).
+            \begin{figure}[h]
+                \centering
+                % \hspace{-1.38cm}
+                \includegraphics{Diagrams-StrideDiagramLocal.drawio.pdf}
+                \caption{Hexapod stride relative to body coordinates.}
+                \label{fig:stride_body}
+            \end{figure}
+
             \noindent
-            \begin{tabularx}{\textwidth}{|l|X|}
-                \hline
-                \multicolumn{2}{|c|}{Stepping State Definition} \\
-                \hline
-                Enter Condition & Is there a mismatch between feet targets and current position? \\
-                \hline
-                On Entering & Calculate and set the leg states based on walking direction, see section \ref{sec:supp_swing_calc}. Choose and optimise nominal targets
-                for the current step, see chapter \ref{chap:optimisation}\\
-                \hline
-                While Active & Adjust feet targets based on direction, stride length and robot height, see chapter \ref{chap:optimisation}\\
-                \hline
-            \end{tabularx}
-            \caption{State Definitions}
-            \label{tab:state_defs}
-        \end{table}
+            As can be seen, the swinging legs move in the direction of movement, following a arced path.
+            While the supporting legs move in the opposite direction of movement following a linear path. 
+
+            \newpage
+            \noindent
+            However, when looking at the same stride in the world reference frame, \(\fworld\), as can be seen in figure \ref{fig:stride_world},
+            the supporting legs appear to stay stationary, while the swinging legs move double the distance relative to that in the body reference frame.
+            \begin{figure}[h]
+                \centering
+                % \hspace{-1.38cm}
+                \includegraphics{Diagrams-StrideDiagramGlobal.drawio.pdf}
+                \caption{Hexapod stride relative to world coordinates.}
+                \label{fig:stride_world}
+            \end{figure}
+
+            \noindent
+            This is important to note because, as further discussed in section \ref{sec:choosing_nominal}, the nominal foot positions are chosen in the body reference frame, but must target a
+            position in the world reference frame.
+        
+        \newpage
+        \subsection{State Machine}
+            The state machine used to realise the tripod gait used in the robot is quite simple, comprised of only two states, stepping and
+            resting, as can be seen from figure \ref{fig:gaitSM}. Table \ref{tab:state_defs} defines the actions that should be taken during
+            each state.
+
+            The primary computation done by this state machine is calculating which legs are supporting and which are swinging, which occurs
+            on entering the "Stepping" state. This function is described in section \ref{sec:supp_swing_calc}.
+
+            \begin{figure}[h]
+                \centering
+                % \hspace{-1.38cm}
+                \includegraphics{Diagrams-GaitSM.drawio.pdf}
+                \caption{Gait State Machine}
+                \label{fig:gaitSM}
+            \end{figure}
+
+            \begin{table}[h]
+                \center
+                \begin{tabularx}{\textwidth}{|l|X|}
+                    \hline
+                    \multicolumn{2}{|c|}{Rest State Definition} \\
+                    \hline
+                    Enter Condition & Has all feet reached their targets? \\
+                    \hline
+                    On Entering & Set all leg states as supporting. \\
+                    \hline
+                    While Active & Do nothing \\
+                    \hline
+                \end{tabularx}
+                
+                \bigskip
+                \noindent
+                \begin{tabularx}{\textwidth}{|l|X|}
+                    \hline
+                    \multicolumn{2}{|c|}{Stepping State Definition} \\
+                    \hline
+                    Enter Condition & Is there a mismatch between feet targets and current position? \\
+                    \hline
+                    On Entering & Calculate and set the leg states based on walking direction, see section \ref{sec:supp_swing_calc}. Choose and optimise nominal targets
+                    for the current step, see chapter \ref{chap:optimisation}\\
+                    \hline
+                    While Active & Adjust feet targets based on direction, stride length and robot height, see chapter \ref{chap:optimisation}\\
+                    \hline
+                \end{tabularx}
+                \caption{State Definitions}
+                \label{tab:state_defs}
+            \end{table}
 
         \newpage
         \subsection{Choosing The Supporting And Swinging Legs} \label{sec:supp_swing_calc}
@@ -216,7 +280,7 @@
             \end{equation}
 
             \newpage
-        \subsection{Choosing nominal foot positions}    
+        \subsection{Choosing nominal foot positions}\label{sec:choosing_nominal} 
             Once the active and inactive legs have been selected it is required to choose nominal targets for all the feet. Sections \ref{sec:support} and \ref{sec:swing}
             describe the process for finding the support and swinging leg targets; It should be noted that target matrices, denoted by \(\bm{t}\), are common between these two sections, but are computed
             differently depending on whether the leg is swinging or supporting.
@@ -288,7 +352,32 @@
 
         \subsection{Existing System}
             The existing system will, at the start of each step, compute an arc for each foot to follow, this arc is then sent to the servo controller
-            to be executed. While efficient and effective in ideal conditions, this method of defining the arc has poor performance when considering external
+            to be executed. The arc is computed as a polynomial passing through three points, the initial point\(q_i\), the middle point \(q_m\), and the final point \(q_f\).
+            Figure \ref{fig:old_arc_vars} shows the variables used to calculate this arc.
+            \begin{figure}[h]
+                \centering
+                \includegraphics{Diagrams-ArcCalc.drawio.pdf}
+                \caption{Variables for calculating foor arc.}
+                \label{fig:old_arc_vars}
+            \end{figure}
+
+            \noindent
+            Equation \ref{eq:old_arc} shows the calculations used to find the starting, middle and end points shown in figure \ref{fig:old_arc_vars}.
+
+            \begin{align}\label{eq:old_arc}
+                OldArcEquation\\
+                OldArcEquation\\
+                OldArcEquation\\
+                OldArcEquation\\
+                OldArcEquation\\
+                OldArcEquation\\
+                OldArcEquation\\
+                OldArcEquation\\
+                OldArcEquation
+            \end{align}
+            where etc\dots
+
+            While efficient and effective in ideal conditions, this method of defining the arc has poor performance when considering external
             influences. If for example the robot has to adjust the final target of its feet mid step, this arc would have to be recomputed in its entirety,
             thus leading to possible performance concerns.
 
@@ -303,6 +392,7 @@
                 \label{fig:old_arc}
             \end{figure}
 
+        \newpage
         \subsection{Improved System}
             The improved system solves this problem by utilising a flow function. During a step, this function will continuously calculate the
             direction that the foot must move to reach its destination. Thus this system is resilient to external disturbances and is capable of adjusting to
