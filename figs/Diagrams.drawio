@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2024-08-28T09:24:38.062Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.4 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="3qmc7-LB4EN5v659mtL2" version="24.6.4" type="device" pages="15">
+<mxfile host="Electron" modified="2024-08-28T09:28:48.653Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.4 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="QwdRLVrfH0_iQH134HSJ" version="24.6.4" type="device" pages="15">
   <diagram name="Kinematics" id="6yCUUO-wR5nd1XfO6lML">
-    <mxGraphModel dx="342" dy="328" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="1" shadow="0">
+    <mxGraphModel dx="703" dy="674" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="1" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -22,7 +22,7 @@
         <mxCell id="bmY2wKETBdRpY1Raq0pr-30" value="" style="group" parent="1" vertex="1" connectable="0">
           <mxGeometry x="334.3836569222283" y="150" width="121.87826086956522" height="121.87499999999999" as="geometry" />
         </mxCell>
-        <mxCell id="bmY2wKETBdRpY1Raq0pr-27" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.arc;startAngle=0.31881983491342203;endAngle=0.4951294309442457;rounded=0;align=center;fontFamily=Times New Roman;fontSize=12;fontColor=default;fillColor=none;gradientColor=none;" parent="bmY2wKETBdRpY1Raq0pr-30" vertex="1">
+        <mxCell id="bmY2wKETBdRpY1Raq0pr-27" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.arc;startAngle=0.31881983491342203;endAngle=0.4903660298363413;rounded=0;align=center;fontFamily=Times New Roman;fontSize=12;fontColor=default;fillColor=none;gradientColor=none;" parent="bmY2wKETBdRpY1Raq0pr-30" vertex="1">
           <mxGeometry width="121.87826086956522" height="121.87499999999999" as="geometry" />
         </mxCell>
         <mxCell id="bmY2wKETBdRpY1Raq0pr-29" value="&lt;font face=&quot;Helvetica&quot; style=&quot;font-size: 13px;&quot;&gt;\(\Theta_2\)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Times New Roman;fontSize=13;fontColor=default;" parent="bmY2wKETBdRpY1Raq0pr-30" vertex="1">
@@ -56,7 +56,7 @@
         </mxCell>
         <mxCell id="xM4FQMTUXsSIVRGq-lQo-3" value="\(L_1\)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Helvetica;fontSize=13;fontColor=default;labelBackgroundColor=none;fillColor=none;gradientColor=none;" vertex="1" connectable="0" parent="bmY2wKETBdRpY1Raq0pr-1">
           <mxGeometry x="0.1426" y="-1" relative="1" as="geometry">
-            <mxPoint x="-91" y="-67" as="offset" />
+            <mxPoint x="-105" y="69" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="bmY2wKETBdRpY1Raq0pr-4" value="" style="endArrow=oval;html=1;rounded=0;startArrow=oval;startFill=1;endFill=0;strokeWidth=2;" parent="1" edge="1">
@@ -179,6 +179,12 @@
         </mxCell>
         <mxCell id="bvsRA-vcZjYpmTul6dNi-21" value="&lt;font face=&quot;Helvetica&quot; style=&quot;font-size: 13px;&quot;&gt;\(\Theta_1\)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Times New Roman;fontSize=13;fontColor=default;" vertex="1" parent="1">
           <mxGeometry x="395.0036569222283" y="551" width="16.38" height="16.56" as="geometry" />
+        </mxCell>
+        <mxCell id="xM4FQMTUXsSIVRGq-lQo-6" value="" style="endArrow=blockThin;html=1;rounded=0;endFill=1;startArrow=blockThin;startFill=1;strokeWidth=1;fontFamily=Times New Roman;fontSize=12;endSize=4;startSize=4;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="333.00115692222835" y="341.77750000000003" as="sourcePoint" />
+            <mxPoint x="397.61" y="323.84000000000003" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
