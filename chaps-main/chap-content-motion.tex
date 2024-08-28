@@ -27,14 +27,16 @@
         \subsection{Coordinate Frames}
             The coordinate frames relevant to the kinematics of the robot are the body coordinate frame, \fbody, and the leg frame, \fleg. All foot targets/positions are specified
             if the body coordinate frame, while the kinematic systems operate in the leg coordinate frame. Thus a conversion from the body to leg frames is required. 
-            Figure \ref{fig:coords_top} show the body and multiple leg coordinate systems.
+            Figure \ref{fig:coords_top} show the world, body and multiple leg coordinate frames.
             \begin{figure}[h]
                 \centering
                 % \hspace{-1.38cm}
-                \includegraphics[width=.7\textwidth]{hexCoords.png}
-                \caption{Body and leg coordinate frames.}
+                \includegraphics[width=.7\textwidth]{Diagrams-BodyFrame.drawio.pdf}
+                \caption{World, body and leg coordinate frames.}
                 \label{fig:coords_top}
             \end{figure}
+
+            \noindent
             The leg coordinate systems are simply rotated and shifted from the body coordinate system. This transformation,\transframe{\bm{x}^\fbody}{\fbody}{\fleg} is defined by equation \ref{eq:body_to_leg},
             \begin{equation}\label{eq:body_to_leg}
             \begin{split}
@@ -51,7 +53,7 @@
             \begin{figure}[h]
                 \centering
                 % \hspace{-1.38cm}
-                \includegraphics[clip, trim=0 0.25cm 0 1.51cm]{kinematics.drawio.pdf}
+                \includegraphics[clip, trim=0 0 1.1cm 0]{Diagrams-Kinematics.drawio.pdf}
                 \caption{Leg coordinate frame with kinematic variables.}
                 \label{fig:kinematics}
             \end{figure}
