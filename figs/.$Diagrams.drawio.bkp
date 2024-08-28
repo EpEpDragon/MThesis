@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2024-08-28T09:39:50.340Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.4 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="KimXKVSUpQxBYq1pWwqq" version="24.6.4" type="device" pages="15">
+<mxfile host="Electron" modified="2024-08-28T09:44:25.006Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.4 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="bfLOtTIDAgNptCqLH-Cy" version="24.6.4" type="device" pages="15">
   <diagram name="Kinematics" id="6yCUUO-wR5nd1XfO6lML">
-    <mxGraphModel dx="575" dy="551" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="1" shadow="0">
+    <mxGraphModel dx="684" dy="656" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="1" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -22,7 +22,7 @@
         <mxCell id="bmY2wKETBdRpY1Raq0pr-30" value="" style="group" parent="1" vertex="1" connectable="0">
           <mxGeometry x="334.3836569222283" y="150" width="121.87826086956522" height="121.87499999999999" as="geometry" />
         </mxCell>
-        <mxCell id="bmY2wKETBdRpY1Raq0pr-27" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.arc;startAngle=0.1655247742579851;endAngle=0.4175747719108949;rounded=0;align=center;fontFamily=Times New Roman;fontSize=12;fontColor=default;fillColor=none;gradientColor=none;" parent="bmY2wKETBdRpY1Raq0pr-30" vertex="1">
+        <mxCell id="bmY2wKETBdRpY1Raq0pr-27" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.arc;startAngle=0.16516498652866252;endAngle=0.4175747719108949;rounded=0;align=center;fontFamily=Times New Roman;fontSize=12;fontColor=default;fillColor=none;gradientColor=none;" parent="bmY2wKETBdRpY1Raq0pr-30" vertex="1">
           <mxGeometry width="121.87826086956522" height="121.87499999999999" as="geometry" />
         </mxCell>
         <mxCell id="bmY2wKETBdRpY1Raq0pr-29" value="&lt;font face=&quot;Helvetica&quot; style=&quot;font-size: 13px;&quot;&gt;\(\Theta_2\)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Times New Roman;fontSize=13;fontColor=default;" parent="bmY2wKETBdRpY1Raq0pr-30" vertex="1">
@@ -191,6 +191,9 @@
             <mxPoint x="399.00115692222835" y="192.9375" as="sourcePoint" />
             <mxPoint x="463.61" y="175" as="targetPoint" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="xM4FQMTUXsSIVRGq-lQo-9" value="\((x^{\mathcal{L_i}},y^{\mathcal{L_i}},z^{\mathcal{L_i}})\)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Times New Roman;fontSize=15;fontColor=default;" vertex="1" parent="1">
+          <mxGeometry x="531" y="499.99999999999994" width="60" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

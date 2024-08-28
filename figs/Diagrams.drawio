@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-08-28T09:40:37.766Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.4 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="tInjUVDB0cBtGSzFICrD" version="24.6.4" type="device" pages="15">
+<mxfile host="Electron" modified="2024-08-28T09:44:53.465Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.4 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="XKy7RHsYPZfiJ7J6LSMk" version="24.6.4" type="device" pages="15">
   <diagram name="Kinematics" id="6yCUUO-wR5nd1XfO6lML">
     <mxGraphModel dx="684" dy="656" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="1" shadow="0">
       <root>
@@ -191,6 +191,9 @@
             <mxPoint x="399.00115692222835" y="192.9375" as="sourcePoint" />
             <mxPoint x="463.61" y="175" as="targetPoint" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="xM4FQMTUXsSIVRGq-lQo-9" value="\((x^{\mathcal{L_i}},y^{\mathcal{L_i}},z^{\mathcal{L_i}})\)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Times New Roman;fontSize=15;fontColor=default;" vertex="1" parent="1">
+          <mxGeometry x="537" y="498.99999999999994" width="60" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
