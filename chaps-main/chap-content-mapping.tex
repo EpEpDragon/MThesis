@@ -163,6 +163,7 @@
         After the heightmap has been generated, the heightmap processing stage operates over the heightmap buffer. This stage has two tasks, to erase the
         old height data as the robot walks around, and to generate the score map, as described in section \ref{sec:scores}.
         
+        \newpage
         \subsection{A note on \ac{gpu} architecture}
             A process on a \ac{gpu} operates fully in parallel and the \ac{gpu} is highly optimised for parallelisation, thus there is a very specific
             execution structure that a \ac{gpu} process abide by to perform at maximum efficiency, or to even function at all. This execution structure is
@@ -194,9 +195,86 @@
             
             Finally it should be noted that while it is possible to vary \(\bm{s_w}\) with each execution cycle, \(\bm{S_l}\) is a constant specified at compile time,
             and as such the number of threads per workgroup cannot be altered during operation.
+
+    \newpage
+    \section{Results}
+        The mapping system described above was tested on the physical robot, this mapping test aims to show how the physical hexapod maps various objects while in motion.
+        The test consists of the robot walking past various obstacles, while simultaneously generating a heightmap.
+
+        Figure \ref{fig:hardware_map_diag} shows a top-down diagram of the placed obstacles used in this test, with the path the robot walks.
+        \begin{figure}[h]
+            \centering
+            \includegraphics{Diagrams-HardwareTest.drawio.pdf}
+            \caption{Top-down diagram of the test setup.}
+            \label{fig:hardware_map_diag}
+        \end{figure}
+
+        \noindent
+        The test objects were selected to show a variety of obstacle types, with a variety of heights, that the robot might encounter, including sloped objects, spherical objects, objects
+        with holes and irregular objects. 
+
+        Figures \ref{fig:hardware_hmap_start}, \ref{fig:hardware_hmap_mid} and \ref{fig:hardware_hmap} show the heightmap, and its corresponding color frame, at the start middle and end of the
+        robot's walking path.
         
-    \bigskip
-    \bigskip
-    \hrule
-    \smallbreak
-    \hrule
+        \newpage
+        \noindent
+        Figure \ref{fig:hardware_hmap_start} shows the heightmap at the start of the generation, at this point the heightmap is essentially a direct representation of what is
+        currently seen by the camera. This is uie clear by the shadows cast by both the robot's leg (on the left) and by the obstacles (the pig and box). In this static case
+        very little noise is also present.
+        \begin{figure}[h]
+            \centering
+            \includegraphics{hmap_start.pdf}
+            \includegraphics[width=.5\textwidth]{color_start.jpeg}
+            \caption{Heightmap generated at the start of the walking path (Top). Color frame at start of walking path (Bottom).}
+            \label{fig:hardware_hmap_start}
+        \end{figure}
+        
+        \newpage
+        \noindent
+        Figure \ref{fig:hardware_hmap_mid} shows the heightmap at a middle point of the path, here it can be seen how some of the shadows have been
+        filled in by the movement of the camera. Particularly, the shadow caused by the robot leg is no longer present, and the shadows cast by the
+        obstacles are reduced. The somewhat spherical pig object now also appears larger as part of the other side became visible.
+        \begin{figure}[h]
+            \centering
+            \includegraphics{hmap_half.pdf}
+            \includegraphics[width=.5\textwidth]{color_half.jpeg}
+            \caption{Heightmap generated at the middle of the walking path.}
+            \label{fig:hardware_hmap_mid}
+        \end{figure}
+
+        \noindent
+        In this heightmap however, noise is more prevalent, this is particularly visible when looking at the floor height, where distinct lines can be observed.
+        These lines are the edge of the field of vision of the camera which is being moved to the right, and is caused by inaccuracies in the position estimation.
+
+        \begin{figure}[h]
+            \centering
+            \includegraphics{hmap.pdf}
+            \includegraphics[width=.5\textwidth]{color.jpeg}
+            \caption{Heightmap generated at the end of the walking path.}
+            \label{fig:hardware_hmap}
+        \end{figure}
+
+        \noindent
+        Finally, the heightmap generated at the end of the walking path can be seen in figure \ref{fig:hardware_hmap}. In this heightmap the shadows cast
+        have been shrunk even more, and some additional objects became visible. The original objects are also now out of vision, but they persist on the heightmap. 
+
+        Figure \ref{fig:hardware_pos} shows the robot's estimated position, with each dot being a estimation. The blue dot is the start of the test and the red dot the end of the test.
+        \begin{figure}[h]
+            \centering
+            \includegraphics{pos.pdf}
+            \caption{Position output from ORB-SLAM3}
+            \label{fig:hardware_pos}
+        \end{figure}
+
+        \noindent
+        As can be seen, the frequency of pose estimation causes there to sometimes be large jumps between estimations. This is especially noticeable at the end where the
+        robot quickly lowers itself. If the system was further optimised to increase the frequency and consistency of estimations the accuracy of the heightmap
+        would also increase.
+
+        Note that the line of motion is not aligned perfectly with the x-axis as stated in the test diagram in figure \ref{fig:hardware_map_diag}, this is due to slight user
+        error while inputting the target velocity, but does not have any negative effects on the resultant heightmap.
+    % \bigskip
+    % \bigskip
+    % \hrule
+    % \smallbreak
+    % \hrule
