@@ -2,8 +2,8 @@
 
 \section{Background}
 
-    There are many applications where vehicles are required to traverse rough terrain, such as in mines, rescue operations, agriculture, construction, etc. In many of these
-    use cases rough terrain makes the use of wheeled, or even tracked, vehicles difficult or impractical.
+    There are many applications where vehicles are required to traverse uneven terrain, such as in mines, rescue operations, agriculture, construction, etc. In many of these
+    use cases uneven terrain makes the use of wheeled, or even tracked, vehicles difficult or impractical.
 
     Compared to wheeled robots, legged robots could perform better in many of these environments, allowing navigation over terrain that would be impossible for wheeled or
     tracked vehicles to navigate. While legged robots possess extreme degrees of potential terrain traversability, advanced control and sensory systems are required to 
@@ -11,76 +11,112 @@
 
 
 \section{Research Goal}
-    The overarching goal of this project is to design and implement a sensory and control system that will allow a hexapod robot to autonomously walk over rough terrain.
+    The overarching goal of this project is to design and implement a sensory and control system that will allow a hexapod robot to autonomously walk over uneven terrain.
 
     This goal of the project is broken up into the following sub objectives:
 
     \begin{enumerate}
-        \item Obtain a mathematical model of the robot, its actuators and its sensors.
-        \item Create a model of the robot in a simulation environment for development and testing.
-        \item Implement a vision based \ac{slam} system.
-        \item Develop a real time vision based dense mapping system for use in anchor point selection.
-        \item Develop a optimisation system to select optimal end effector anchor points based on the surrounding terrain.
-        \item Implement and test the system in simulation and on the physical hexapod.
+        \item Mathematically model the robot, its actuators, and its sensors.
+        \item Create a simulation model of the robot in a suitable simulation environment for development and testing.
+        \item Implement and test a baseline motion control system that enables the robot to
+        perform a normal walking motion over flat, featureless terrain.
+        \item Develop a real-time vision-based dense mapping system that enables the robot to sense and create a three-dimensional 
+        dense map of the surrounding terrain in real time using images obtained from its onboard RBG-D camera.
+        \item Implement a vision-based \ac{slam} system system that enables the robot to localise itself relative to the terrain
+        while simultaneously creating the dense map of the terrain.
+        \item Develop a foot placement planning method that analyses the dense terrain map and determines suitable positions
+        for the hexapod to place its feet while walking over uneven terrain.
+        \item Extend the baseline motion control system to enable the robot to perform a modified walking motion over uneven terrain.
+        \item Implement and test the system in simulation and on the physical hexapod robot.
     \end{enumerate}
 
 
 \section{Methodology}
-    When deciding how to determine optimal end effector placement various sensing methods were considered, such as using a \ac{rgbd} camera to view the environment,
-    placing force sensors on the robots end effectors or measuring servo torque to determine when the end effectors were in contact with a surface. A previous paper by \cite{erasmus2023guidance} used a \ac{rgbd} camera
-    by storing past snapshots to adjust the end effectors to the optimal height, it was decided that the primary sensing method for this thesis would also be a \ac{rgbd} camera
-    but instead of storing snapshots, a height map would be generated of the local environment. This would allow for more advanced methods of anchor point selection.
+    When deciding how to determine optimal foot placement, various sensing methods were considered, such as using a \ac{rgbd} camera to view the environment,
+    placing force sensors on the robot's feet or measuring servo torques to determine when the feet are in contact with a surface. Since a previous paper by \cite{erasmus2023guidance} used a \ac{rgbd} camera
+    by storing past image snapshots to adjust the feet to the correct height, it was decided that the primary sensing method for this thesis would also be a \ac{rgbd} camera, but instead of storing previous images,
+    an onboard heightmap would be generated of the local environment. This would allow for more advanced methods of anchor point selection.
 
-    The first step in realising this system was to construct a accurate simulation of the hexapod. The primary simulation packages that were considered are Gazebo, PyBullet and \ac{mujoco}.
-    Gazebo was a appealing choice due to the easy integration with ROS, however it was decided to use \ac{mujoco} since it was found to have superior contact physics simulation \citep{Erez-2015}.
+    The first step in realising this system was to construct a representative simulation of the hexapod. The primary simulation packages that were considered are Gazebo, PyBullet, and \ac{mujoco}.
+    Gazebo was an appealing choice due to its easy integration with \acf{ros}. However it was decided to use \ac{mujoco} since it was found to have superior contact physics simulation \citep{Erez-2015}.
 
-    Once the hexapod was adequately modelled in \ac{mujoco} a tripod gait state machine, \ac{ik} system and control interface was implement, at this stage the hexapod was capable of walking
-    on flat terrain.
+    Once the hexapod was adequately modelled in \ac{mujoco}, aa baseline motion control system for the hexapod to walk on flat terrain. The baseline control system included a tripod gait state machine,
+    a foot position and trajectory planner, and leg motion controllers based on the inverse kinematics. The control interface allowed a user to command the hexapod to walk at a commanded speed in a commanded direction.
 
-    Next the the system to generate the height map was implemented, this entailed sampling the \ac{rgbd} camera and comparing cells in the height map against the depth buffer.
-    Once the height map was implemented it was possible to build the system responsible for end effector placement, this is covered in detail in \autoref{chap:effector-placement},
-    after which collision checking for the generated end effector motion was implement, ensuring that the hexapod does not get stuck on pieces of terrain.
+    Next, the the system to generate the heightmap from the images taken by the RGB-D camera was implemented. This entailed using the depth information in the \ac{rgbd} images
+    to update the occupancy information in the cells of the height map.
+    Once the height map was implemented, the system to perform foot placement planning on uneven terrain was developed. 
+    The foot placement planning system operates by using parallel image processing to generate a
+    walkability score map from the heightmap, which takes into account a cell's steepness and a cell's proximity to steep terrain.
+    The nominal foot positions generated by the baseline motion system are then shifted to a location on 
+    the score map with a acceptable walkability score, this shifted position is used as the new, optimised foot target.
 
-    With this the system was realised in simulation, next the system was implemented and tested on the physical robot, discussed in detail in \autoref{chap:hardware}
+    The integrated system was first implemented and tested on the simulation model of the hexapod robot in MuJuCo.
+    The mapping component of the system was then implemented and practically tested on the physical hexapod robot.
 
-\newpage
 \section{Scope and Limitations}
 
-    As the hardware used was developed by \cite{erasmus2023guidance} this project will focus only on developing the necessary software to control het robot hardware.
+    % As the hardware used was developed by \cite{erasmus2023guidance} the project will focus only on developing the necessary software to control the robot hardware.
 
-    The primary systems developed in this paper are the mapping and terrain scoring systems, while lower level systems such as foot arc generation and kinematics are also
-    implemented. The scope of this project does not include autonomous waypoint navigation and thus requires a human operator to provide desired velocity
-    commands. If no solution can be found for the given velocity command the system will not attempt to adjust the velocity command, the human operator will be required to
-    adjust the command.
+    % The primary systems developed in this paper are the mapping and terrain scoring systems, while lower level systems such as foot arc generation and kinematics are also
+    % implemented. 
+    
+    The purpose of the system is to perform foot planning to allow the hexapod to move over uneven terrain.
+    The system is not expected to provide obstacle avoidance or high-level path planning to avoid hazardous terrain.
 
-    The \ac{slam} system used, ORB-SLAM3, was developed by \cite{campos2021orb}.
-    It should be noted however that ORB-SLAM3 does generate a global sparse feature map of the environment, thus the larger map necessary for a waypoint navigation system is present.
+    The user interface to the system is a velocity command to the hexapod which specifies the speed and direction
+    in which the hexapod must walk. The hexapod is to walk in a straight line at the velocity commanded by the
+    user, while adjusting its foot placements to compensate for the terrain. The scope of the project does not
+    include a waypoint navigation system. However, if the hexapod is able to follow velocity commands while
+    adjusting its feet for the terrain, the system could easily be extended to also perform waypoint navigation.
 
-    The sensors used in this project are limited to a single \ac{rgbd} camera, thus even with the generation of a local map, there could be cases where the system will not have
-    height data around a desired anchor point. No torque or touch sensors are used to augment the system, thus if a leg were to collide with terrain not accurately captured by the camera,
-    the robot will not adjust its trajectories.
-    The system will however attempt to choose a step path based on the local heightmap such that no collision occurs. Additionally no \ac{imu} is used, thus, stability of the robot is entirely
-    dependant on the accuracy of terrain heightmap and pose estimation is entirely dependant on the visual \ac{slam} system.
+    The feet must be placed on suitable surfaces that can support the hexapod. Foot placements positions are
+    considered to be suitable if the foot placement area is relatively flat and not too steeply inclined,
+    if the foot will not be placed in close proximity to a steep edge, and if the height of the terrain at
+    the intended foot placement position is known. The last requirements is intended to prevent the hexapod
+    from stepping on surfaces it has not seen yet, or from stepping into holes in the terrain.
 
-\section{Performance Requirements}
-    The performance requirements of the final system is that the robot must remain stable in rotation whilst walking over rough terrain, it must also be able to maintain a straight path
-    over the terrain, with the caveat that the terrain is navigable. This must be achieved without colliding with the terrain.
+    The hexapod is not expected to identify unstable terrain or hazardous terrain types, such as loose
+    earth or pools of water. This could be the topic of future projects.
+
+    The hexapod assumes that the uneven terrain is navigable, and trusts that the user will not steer
+    it to navigate terrain that does not contain any suitable foot placement locations. If the system encounters
+    un-navigable terrain, the robot will simply freeze in place and await an updated velocity command from the
+    operator.
+
+    The primary focus of the project is the development of the mapping, terrain scoring, and foot placement planning
+    functions. A secondary focus is the development of the hexapod simulation model with representative contact physics.
+    For the practical testing, the physical hexapod robot developed by \cite{erasmus2023guidance} was used, and the software
+    that implements the  mapping, scoring, and foot placement planning was added. The \ac{slam} function was implemented
+    by using the ORB-SLAM3 software library, which was developed by \cite{campos2021orb}. The ORB-SLAM3 library only performed
+    the sparse mapping necessary for localisation.
+
+    It is assumed that the terrain sensing is limited to the images obtained from the RGB-D camera. Other terrain
+    sensing methods, such as contact sensors on the feet, or torque sensors on the servo motors, are not available.
+    If a leg were to collide with terrain due to inaccuracies in the terrain map, the robot would not adjust the leg trajectory.
+
+    It is assumed that the hexapod robot is not equipped with an intertial measurment unit (IMU). The stability of the
+    robot on the terrain therefore depends on the accuracy of the heightmap, and the hexapod's pose estimate depends
+    entirely on the visual SLAM system.
 
 \section{Thesis Outline}
 
     Chapter 2 provides a literature review on the methods of control, sensing and simulation used for hexapod robots.
 
-    Chapter 3 provides a overview of the hexapod hardware and the modelling thereof. This includes the robots mechanical form, sensors, on board computers and the simulation environment
-    that is used.
+    Chapter 3 provides an overview of the physical hexapod robot that was used for the project, and the simulation model that was created to
+    support the development and testing of the system and the modelling thereof. The overview includes the robot's mechanical hardware,
+    onboard computer and sensors, and the simulation environment that was used.
 
-    Chapter 4 describes the environment mapping systems used, this includes the local dense height map and the sparse \ac{slam} system.
+    Chapter 4 describes the mapping system that was developed, including the dense height map to represent
+    the local terrain about the hexapod, and the sparse SLAM system to localise the hexapod within the terrain
 
-    Chapter 5 covers motion related topics, this includes the walking gait, \ac{ik} and effector motion planning.
+    Chapter 5 describes the baseline motion control system that enables the hexapod to walk over flat, featureless terrain.
 
-    Chapter 6 describes the optimisation function and its various scores used to acquire the optimal end effector anchor points during each step taken.
+    Chapter 6 describes the foot placement planning system that was developed to allow the hexapod to walk over
+    uneven terrain. The system includes a terrain scoring system to analyse the terrain and an optimal search algorithm to find suitable foot placement positions
 
-    Chapter 7 covers the hardware implementation process and software structure on the hardware.
+    Chapter 7 describes the hardware and software implementation of the system on the physical hexapod robot.
 
-    Chapter 8 describes the various tests preformed and results obtained thereof.
+    Chapter 8 describes the final simulation tests that were performed on the system and presents the test results.
 
-    Chapter 9 provides the conclusion of the research and any recommended future additions.
+    Chapter 9 provides the conclusion of the research and recommendations for future work.

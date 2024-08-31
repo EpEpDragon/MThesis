@@ -8,6 +8,7 @@ communication between devices using various different communication protocols. T
 \ac{ros} nodes, where every node is treated a component in a large network. All ros nodes are joined together by the core node,
 which is hosted at a set IP address on the network.
 
+\newpage
 \section{ROS Nodes} \label{sec:ros_nodes}
 There are various ros nodes spread out across the base station, the Jetson Nano and the Teensy \ac{mcu}, figure \ref{fig:nodes} provides and overview
 of the nodes and how they communicate with each other. Section \ref{sec:base_ros} and \ref{sec:on_board_ros} go into detail on the publishers and subscribers
@@ -22,7 +23,6 @@ Further detail pertaining to communication using \ac{ros} is provided in section
     \label{fig:nodes}
 \end{figure}
 
-\newpage
 \section{ROS communication} \label{sec:ros_comms}
     This section provides a detailed description of the \ac{ros} communication scheme used in the system as shown in figure \ref{fig:nodes}.
     \subsection{Base Station} \label{sec:base_ros}
@@ -43,7 +43,6 @@ Further detail pertaining to communication using \ac{ros} is provided in section
             \label{tab:base_pubs}
         \end{table}
         
-        \noindent
         The robot currently only has two operating modes, torque cutoff mode and walking mode. The torque cutoff mode is the initial mode the robot is in,
         while in this mode the leg servos disable all torque control, thus entering a relaxed state. In walking mode the robot walks in the commanded direction
         whilst optimising its foot positions according to the terrain. If the robot encounters a piece of terrain for which no optimisation can be found the
@@ -72,7 +71,12 @@ Further detail pertaining to communication using \ac{ros} is provided in section
     \subsection{On Board} \label{sec:on_board_ros}
         The hexapod has two computational units on board, first the Jetson Nano, which handles all high level operations, including heightmap generation and scoring,
         foot optimisation, maintain a walking gait and localisation using ORB-SLAM3. Secondly a Teensy2.0 \ac{mcu} handles low level operations, including interpolating feet movement paths
-        and servo control. Table \ref{tab:jetson_pubs} to \ref{tab:teensy_subs} describe the \ac{ros} publishers and subscribers present on these two computational units.
+        and servo control. 
+        Table \ref{tab:jetson_pubs} to \ref{tab:teensy_subs} describe the \ac{ros} publishers and subscribers present on these two computational units.
+        
+        The camera data, heightmap data, position and rotation are published for display at the base station.
+        While the effector targets are published for use on the Teensy to move the robot's feet to the optimised positions.
+        \newpage
         \begin{table}[h]
             \centering
             \begin{tabularx}{\textwidth}{| l | l | X | l |}
@@ -90,10 +94,7 @@ Further detail pertaining to communication using \ac{ros} is provided in section
             \caption{Jetson publishers}
             \label{tab:jetson_pubs}
         \end{table}
-
-        \noindent
-        The camera data, heightmap data, position and rotation are published for display at the base station.
-        While the effector targets are published for use on the Teensy to move the robot's feet to the optimised positions.
+        % \newpage
         \begin{table}[h]
             \centering
             \begin{tabularx}{\textwidth}{| l | l | X |}
@@ -101,9 +102,9 @@ Further detail pertaining to communication using \ac{ros} is provided in section
                 \multicolumn{3}{|c|}{\textbf{Jetson Subscribers}} \\ \hline
                 \textbf{Name}  & \textbf{Data Type} & \textbf{Description} \\ \hline
                 % walk\_dir & Description & Data Type & Frequency \\ \hline
-                command\_data & HexapodCommands & Commands from the base station. \\ \hline
-                color/image\_raw & Image & Raw color image from the \ac{rgbd} camera. \\ \hline
-                aligned\_depth\_to\_color/image\_raw & Image & Raw depth image from the \ac{rgbd} camera. \\ \hline
+                command\_data & HexapodCommands & Operator commands. \\ \hline
+                color/image\_raw & Image & Color image from the camera. \\ \hline
+                aligned\_depth\_to\_color/image\_raw & Image & Depth image from the camera. \\ \hline
             \end{tabularx}
             \caption{Jetson subscribers}
             \label{tab:jetson_subs}
