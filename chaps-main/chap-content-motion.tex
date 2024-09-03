@@ -39,12 +39,15 @@
 
             \noindent
             The leg coordinate systems are simply rotated and shifted from the body coordinate system. This transformation,\transframe{\bm{x}^\fbody}{\fbody}{\fleg} is defined by equation \ref{eq:body_to_leg},
+            further explained explained in appendix \ref{app:transforms}.
             \begin{equation}\label{eq:body_to_leg}
             \begin{split}
                 \bm{x}^\fleg &= \transframe{\bm{x}^\fbody}{\fbody}{\fleg} \\
                 & = \bm{Q}_i^\fbody\cdot\bm{x}^\fbody\cdot\bm{Q}^{\fbody^{-1}}_{i} - \bm{R}_i
             \end{split}
             \end{equation}
+
+            \noindent
             where the \(\fleg\) is the coordinate frame of leg \(i\), \(\bm{Q}_i^\fbody\) is the rotation of said coordinate frame and \(\bm{R}^\fbody_i\) is the root position of
             said leg coordinate frame in the body coordinate frame. For more detail on this transformation, such as the values of \(\bm{Q}_i^\fbody\) and \(\bm{R}^\fbody_i\), please see
             appendix \ref{app:transforms}.

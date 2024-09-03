@@ -211,25 +211,77 @@ floor height based on the terrain is described.
         \label{fig:full_score}
     \end{figure}
 
+    \noindent
     Finally, the radial search algorithm described in section \ref{sec:radial_search} is used to optimise various nominal foot end positions.
     This is shown in figure \ref{fig:optimisation_test}.
+    \newpage
     \begin{figure}[h]
         \centering
         \includegraphics[width=.6\textwidth]{scoreTestFinal.png}
         \caption{Walkability score optimisation test.}
         \label{fig:optimisation_test}
     \end{figure}
+
+    \noindent
     If the nominal foot position is in an acceptable position, the position will not be further optimised, this can be seen with the left most
     nominal position in figure \ref{fig:optimisation_test}. If however the nominal position is too close to an edge, such as with the top-right example, 
     the nominal position is optimised to the closest acceptable position. The optimised position does not need to have a perfect score, as can be seen in the bottom-right example, this example is similar to 
     the aforementioned top-right, but it adjusts onto the ram, which has a non-perfect, however acceptable, walkability score.
     Next the right most example shows how the nominal position is place on a piece of terrain that is too steep, this it is optimised onto the flat surface on top of the round pedestal. 
     
+    % \noindent
     Finally, the top-left and bottom-left examples show the case of a nominal position placed on a sloped pillar and a sloped hole respectively.
     In both cases the nominal position is optimised to the flat surface at the to of the pillar and at the bottom of the hole.
     
     The flat surfaces on the pillar an in the hole are large enough to not be rejected by the edge proximity score, however, if the inclines sere steeper or the flat surface smaller it is possible that these nominal positions would be
     unsolvable, as there is no appropriate foot end placement inside the search radius. In this case the robot would need to make a course adjustment.
+
+    \newpage
+    \subsection{Hardware Scoring Test}
+        Using the same colour scheme as above, the hardware heightmap found in section \ref{sec:hardware_hmap} is shown in figure \ref{fig:harware_hmap}. The scoring system is then
+        applied to this heightmap as shown in figure \ref{fig:hardware_score_map}.
+        \begin{figure}[h]
+            \centering
+            \begin{subfigure}{.45\textwidth}
+                \includegraphics[height=.95\linewidth, left]{hardware_map.png}
+                \caption{Hardware heightmap}
+                \label{fig:harware_hmap}
+            \end{subfigure}%
+            \begin{subfigure}{.45\textwidth}
+                \includegraphics[height=.95\linewidth, right]{score_test_hardware.png}
+                \caption{Score applied to hardware heightmap.}
+                \label{fig:hardware_score_map}
+            \end{subfigure}
+            \caption{Heightmap generated from hardware and the corresponding score map.}
+            \label{fig:hardware_hmap_scoremap}
+        \end{figure}
+
+        \noindent
+        As can be seen from figure \ref{fig:hardware_hmap_scoremap} the scoring system applied to the hardware generated heightmap generates
+        similarly to when it is applied to a ideal heightmap. The primary difference that should be noted is the score artifacts created around
+        the mapped areas edge, seen as a outline around the mapped area. Additionally to the outline around the mapped area, within the mapped area
+        light score lines can be seen. These lines are most clear on the portion of flat terrain. The lines are created by the moving field of vision
+        and inaccuracies in the position, mostly height, estimation, as explained previously in section \ref{sec:hardware_hmap}.
+
+        It should also be noted that while the score for the sloped plane at the top of the heightmap is not as even as it was in the ideal heightmap,
+        even with these undulations present it is still sufficiently accurate for the correct foot position correction to be mad.
+        This can be seen in figure \ref{fig:hardware_test_points} which shows a couple of nominal test points applied to the hardware generated score map.
+
+        \newpage
+        \begin{figure}[h]
+            \centering
+            \includegraphics[width=.6\textwidth]{score_test_hardware_points.png}
+            \caption{Test points on hardware score map.}
+            \label{fig:hardware_test_points}
+        \end{figure}
+
+        \noindent
+        As expected, the test points applied to the hardware score map behaves similarly the the ideal case shown in figure \ref{fig:optimisation_test},
+        with all the nominal points being adjusted to appropriate new positions. Note the point applied to the sloped plane at the top of the map is adjusted
+        appropriately even with the slightly undulating score map across the sloped area.
+
+        Additionally, it should be noted that while some of the outlining artifacts do grow large enough to affect the final foot positions, as can be seen in the
+        left most test point, these effects are generally not large enough to warrant concern.
 
 
 % \bigskip

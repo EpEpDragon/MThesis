@@ -9,15 +9,15 @@
         This chapter covers the design of the mapping system.
 
         The localisation, sparse mapping and pose estimation is handle by ORB-SLAM3 as described in \cite{campos2021orb}. Since ORB-SLAM3 is not a system designed by the author, its
-        design will not be covered in this chapter. Implementation and operation details will however be covered in chapters \ref{chap:hardware} and \ref{chap:results}.
+        design will not be covered in this chapter.
 
     \section{Projection}
         In order to generate a heightmap from a \ac{rgbd} image, it is first required to project the \ac{rgbd} image into 3D space, this is necessary because a heightmap is essentially a 3D environment,
         that can be represented as a image due to the assumption of purely convex geometry. 
 
         The camera can be described by its intrinsic and extrinsic parameters. Extrinsic parameters characterise the
-        cameras position in 3D space, and intrinsic parameters characterise the relationship between the image plane 3D space, 
-        assuming the camera is at the world origin and an zero rotation. \cite{hartley2003multiple}.
+        cameras position in 3D space, and intrinsic parameters characterise the relationship between the image plane and 3D space, 
+        assuming the camera is at the world origin and an zero rotation \citep{hartley2003multiple}.
 
         Refer to figure \ref{fig:projection} as a visual aid regarding projection. Note that this figure is drawn from the perspective of projecting from the image plane into the world,
         if the objective was to project from the world onto the image plane the projection center and image plane would swap places, causing the image to be inverted, thus, this figure assumes
@@ -40,7 +40,6 @@
         \end{equation}
         where \(\bm{K}\) is the intrinsic matrix and \(\begin{bmatrix} \bm{R} & \bm{T} \end{bmatrix}\) the extrinsic matrix, these are described
         in equation \ref{eq:intrinsic} and \ref{eq:extrinsic}.
-
         The projection matrix can be used to project a point on the image plane into world space as shown in equation \ref{eq:full_projection}.
 
         \begin{equation} \label{eq:full_projection}
@@ -58,6 +57,8 @@
             \end{bmatrix}
         \end{equation}
         where \(u,v\) are the pixel coordinates on the image plane and \(x,y,z\) are the coordinates in world space.
+
+        The intrinsic matrix \(\bf{K}\) is defined as such,
         \begin{equation} \label{eq:intrinsic}
             \bm{K} =
             \begin{bmatrix}
@@ -134,12 +135,20 @@
             \label{fig:memory}
         \end{figure}
 
+        \noindent
         The heightmap buffer, \(\bm{M}\), is of size \(N \times N\) and is indexed by \(i,j\). In order to write the height value into the heightmap, the camera point in camera space,
         \(\bm{p}\inrefframe{\fcamera}\), is translated into map space, \(\bm{p}\inrefframe{\fmap}\), as shown in equation \ref{eq:project_to_map},
         \begin{equation} \label{eq:project_to_map}
             \bm{p}\inrefframe{\fmap} = \transframe{\bm{p}\inrefframe{\fcamera}}{\fcamera}{\fmap}
         \end{equation}
-        see appendix \ref{app:transforms} for transformation definitions.
+        where \transframe{\bm{x}\inrefframe{\fcamera}}{\fcamera}{\fmap} is defined as in equation \ref{eq:camera_to_map},
+        see appendix \ref{app:transforms} for more information.
+        \begin{align} \label{eq:camera_to_map}
+            \begin{split}
+                \bm{x}\inrefframe{\fmap} &= \transframe{\bm{x}\inrefframe{\fcamera}}{\fcamera}{\fmap}\\ 
+                &= (\bm{q}_\text{cam} \cdot \bm{x}\inrefframe{\fcamera} \cdot \bm{q}_\text{cam}^{-1}S + \bm{p_\text{rob}}\inrefframe{\fmap}) \mod N
+            \end{split}
+        \end{align}
 
     \newpage
     \section{GPU Compute Pipeline}
@@ -197,7 +206,7 @@
             and as such the number of threads per workgroup cannot be altered during operation.
 
     \newpage
-    \section{Hardware Mapping Test}
+    \section{Hardware Mapping Test}\label{sec:hardware_hmap}
         The mapping system described above was tested on the physical robot, this mapping test aims to show how the physical hexapod maps various objects while in motion.
         The test consists of the robot walking past various obstacles, while simultaneously generating a heightmap.
 
@@ -225,7 +234,7 @@
             \centering
             \includegraphics{hmap_start.pdf}
             \includegraphics[width=.5\textwidth]{color_start.jpeg}
-            \caption{Heightmap generated at the start of the walking path (Top). Color frame at start of walking path (Bottom).}
+            \caption{Heightmap generated at the start of the walking path (Top). Color frame at the start of walking path (Bottom).}
             \label{fig:hardware_hmap_start}
         \end{figure}
         
@@ -238,7 +247,7 @@
             \centering
             \includegraphics{hmap_half.pdf}
             \includegraphics[width=.5\textwidth]{color_half.jpeg}
-            \caption{Heightmap generated at the middle of the walking path.}
+            \caption{Heightmap generated at the middle of the walking path (Top). Color frame at the middle of walking path (Bottom).}
             \label{fig:hardware_hmap_mid}
         \end{figure}
 
@@ -250,7 +259,7 @@
             \centering
             \includegraphics{hmap.pdf}
             \includegraphics[width=.5\textwidth]{color.jpeg}
-            \caption{Heightmap generated at the end of the walking path.}
+            \caption{Heightmap generated at the end of the walking path (Top). Color frame at the end of walking path (Bottom).}
             \label{fig:hardware_hmap}
         \end{figure}
 

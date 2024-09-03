@@ -1,1 +1,15 @@
 \chapter{Conclusions}
+
+Throughout this thesis a system to map terrain and score terrain for walkability was designed and implemented. Then a baseline tripod gait walking system
+was implemented, this system generated foot positions that would allow the hexapod robot to blindly walk over flat terrain. The walkability was then used
+to adjust the nominal foot positions from the baseline walking system to the terrain, in both the horizontal and vertical planes.
+
+Various tests were performed to validate the effectiveness of these systems in simulation and in hardware. The tests revealed that the mapping and scoring
+systems performed well, with possible improvements in the frequency of pose updates from the SLAM system to reduce noise and artifacts in the heightmap.
+
+The walking testes, performed in simulation, showed that the system is capable of successfully navigating uneven terrain with large vertical 
+displacements, such as stairs, and horizontal undulations, such as an assortment of rocks.
+
+As the system focuses exclusively on the mapping and feet motion planning aspect of the robot, future work could include macro scale path planning and
+waypoint navigation. Furthermore, terrain could be classified by not only its geometric shape, but also by its material characteristics, such as 
+differentiating between sand, rock, dirt, etc.

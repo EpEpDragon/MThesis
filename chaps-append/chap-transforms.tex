@@ -7,8 +7,8 @@
     \section{Camera to Map}
         Transforming a vector from camera,\ to map space requires rotating the vector by the camera quaternion, adding
         te camera's global position to the vector, scaling the vector into the map by multiplying with the map scaling
-        factor, and finally modulating the vector to the confines of the map. As shown in equation \ref{eq:camera_to_map}.
-        \begin{align} \label{eq:camera_to_map}
+        factor, and finally modulating the vector to the confines of the map. As shown in equation \ref{eq:camera_to_map_a}.
+        \begin{align} \label{eq:camera_to_map_a}
         \begin{split}
             \bm{x}\inrefframe{\fmap} &= \transframe{\bm{x}\inrefframe{\fcamera}}{\fcamera}{\fmap}\\ 
             &= (\bm{q}_\text{cam} \cdot \bm{x}\inrefframe{\fcamera} \cdot \bm{q}_\text{cam}^{-1}S + \bm{p_\text{rob}}\inrefframe{\fmap}) \mod N
@@ -71,3 +71,20 @@
         where \(\bm{q}_\text{bod}\) is the robot body's quaternion.
     
     \section{Body to Leg}
+    The body to leg transformation is a very simple transformation, consisting of only a rotation. This is because
+    the body and leg frames are aligned to the same z axis. As there are six distinct leg coordinate frames the leg frame is
+    annotated as, \(\fleg\), with the subscript \(i\) indicating the frame's associated leg number. Equation \ref{eq:body_to_leg_a}
+    shows this transformation.
+    \begin{equation}\label{eq:body_to_leg_a}
+        \begin{split}
+            \bm{x}^\fleg &= \transframe{\bm{x}^\fbody}{\fbody}{\fleg} \\
+            & = \bm{Q}_i^\fbody\cdot\bm{x}^\fbody\cdot\bm{Q}^{\fbody^{-1}}_{i} - \bm{R}_i
+        \end{split}
+        \end{equation}
+
+    \noindent
+    where \(\bm{Q}_i^\fbody\) is the rotation quaternion of leg \(i\).
+    
+    Note that this rotation need not be represented as a
+    quaternion, as it is a simple single axis rotation, but as it is entirety possible to have a leg axis system with a multi axis
+    rotation, and quaternions are used throughout this paper, it was decided to use quaternions.
