@@ -40,7 +40,7 @@
     The first step in realising this system was to construct a representative simulation of the hexapod. The primary simulation packages that were considered are Gazebo, PyBullet, and \ac{mujoco}.
     Gazebo was an appealing choice due to its easy integration with \acf{ros}. However it was decided to use \ac{mujoco} since it was found to have superior contact physics simulation \citep{Erez-2015}.
 
-    Once the hexapod was adequately modelled in \ac{mujoco}, aa baseline motion control system for the hexapod to walk on flat terrain. The baseline control system included a tripod gait state machine,
+    Once the hexapod was adequately modelled in \ac{mujoco}, a baseline motion control system for the hexapod to walk on flat terrain. The baseline control system included a tripod gait state machine,
     a foot position and trajectory planner, and leg motion controllers based on the inverse kinematics. The control interface allowed a user to command the hexapod to walk at a commanded speed in a commanded direction.
 
     Next, the the system to generate the heightmap from the images taken by the RGB-D camera was implemented. This entailed using the depth information in the \ac{rgbd} images
