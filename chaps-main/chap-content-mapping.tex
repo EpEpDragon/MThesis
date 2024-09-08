@@ -161,7 +161,7 @@
         
         After the heightmap has been generated, the heightmap processing stage operates over the heightmap buffer. This stage has two tasks, to erase the old height data as the robot walks around, and to generate the score map, which will be described in chapter \ref{chap:optimisation}.
         
-        \newpage
+        % \newpage
         \subsection{A note on \ac{gpu} architecture}
             A process on a \ac{gpu} operates fully in parallel and the \ac{gpu} is highly optimised for parallelisation. Thus, there is a very specific execution structure that a \ac{gpu} process must abide by to perform at maximum efficiency, or to even function at all. This execution structure is as follows: As per \cite{nvidia_doc}, when writing compute code, a 3D size is specified, namely the localgroup size, \(\bm{N}_{l} = [X_l,Y_{l},Z_{l}]\). Next when the \ac{cpu} dispatchesa compute task, the workgroup count, is fed as parameter, \(\bm{n}_{w} = [x_{w},y_{w},z_{w}]\). The \ac{gpu} then initialises \(\bm{n}_w\) workgroups, and each workgroup initialises \(\bm{N}_l\) threads. These threads are executed into warps, or waves, which, depending on the architectures processor count,can be either 32 or 64 threads. To ensure maximum efficiency it is important that \(\bm{N}_l\) is divisible by the warp size.
             Originally, Nvidia \ac{gpu}s utilised a warp size of 32 and AMD GPUs a warp size of 64, however with AMD's latest RDNA architecture, the warp size could be either 32 or 64. For the mapping system developed in this project, a warp size of 32 was used.
@@ -182,7 +182,7 @@
             Finally, it should be noted that, while it is possible to vary \(\bm{n_w}\) with each execution cycle, \(\bm{N_l}\) is a constant specified at compile time,
             and as such the number of threads per workgroup cannot be altered during operation.
 
-    \newpage
+    % \newpage
     \section{Simultaneous Localisation and (Sparse) Mapping} \label{sec:orbslam3}
     This section provides a brief overview of the implementation and usage of ORB-SLAM3 from a user perspective.
     
