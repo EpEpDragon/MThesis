@@ -1,30 +1,23 @@
 \chapter{Foot Placement Optimisation} \label{chap:optimisation}
-This chapter describes the processes necessary for optimising the foot end positions, starting by describing the method of scoring the heightmap generated in
-chapter \ref{chap:mapping}. Next a semi radial search algorithm for use in locating the position with the best score. Finally the process of choosing a reference
-floor height based on the terrain is described.
+This chapter describes the processes necessary for optimising the foot end positions, starting by describing the method of scoring the heightmap generated in chapter \ref{chap:mapping}. Next, a semi radial search algorithm for locating the position with the best score is described. Finally, the process of choosing a reference floor height based on the terrain is described.
+
 \section{Overview}
-    The best possible anchor points for the supporting feet, given an initial point from the walking
-    gait state machine, must be found based on the heightmap. This is achieved by assigning a walkability score to each cell in the heightmap based on the
-    cells slope and its proximity to edges.
-
-    To find the first, best foot end position relative to the nominal foot end position, a semi radial search algorithm is used
-
-    Finally, since the robot will be walking over terrain it is required to adjust its reference for the floor height.
+    The best possible foot placement points for the supporting feet, given an initial point from the walking gait state machine, must be found based on the heightmap. This is achieved by assigning a walkability score to each cell in the heightmap based on the cell's slope and its proximity to edges. To find the first, best foot end position relative to the nominal foot end position, a semi radial search algorithm is used. Finally, since the robot will be walking over terrain, it is required to adjust its reference for the floor height. 
 
 \section{Scoring} \label{sec:scores}
     The scores considered are the slope and proximity scores. The slope score aims to reject points with high slopes while the proximity score rejects points close
-    to other parts of the terrain with steep inclines, i.e. to reject points inside holes or close to ledges.
+    to other parts of the terrain with steep inclines, that is, to reject points inside holes or close to ledges. Note that cells with low scores are desirable placement positions and cells with higher values are less desirable.
     \subsection{Slope Score}
         The slope score is simply taken as the slope of the terrain at the current point. The aim of this score is to prevent the robot from slipping due to
         selecting anchor points with too steep of a slope.
         
+        \noindent
         As the heightmap slope is not defined by a known function, the slope is calculated using the Sobel
-        operator (\cite{sobel2014}), a combination of a central finite difference and a smoothing operator.
+        operator \citep{sobel2014}, a combination of a central finite difference and a smoothing operator.
 
-        Equation \ref{eq:sobelgx} and \ref{eq:sobelgy} describe the two separable x and y direction kernels, \(G_x\) and \(G_y\),
-        of the Sobel operator. These kernels are a combination of central finite difference and smoothing operator, see Appendix \ref{app:sobel} 
-        for a breakdown. Equation \ref{eq:sobelsg} combines \(G_x\) and \(G_y\) to produce the slope score, \(S_g\). Note that these equations represent
-        a single scalar result of the Sobel operator using the Frobenius inner product, \cite{horn2012matrix}. If evaluated over the whole heightmap this is equivalent
+        Equations \ref{eq:sobelgx} and \ref{eq:sobelgy} describe the two separable x and y direction kernels, \(G_x\) and \(G_y\),
+        of the Sobel operator. These kernels are a combination of central finite difference and smoothing operator. Equation \ref{eq:sobelsg} combines \(G_x\) and \(G_y\) to produce the slope score, \(S_g\). Note that these equations represent
+        a single scalar result of the Sobel operator using the Frobenius inner product \citep{horn2012matrix}. If evaluated over the whole heightmap, this is equivalent
         to convolution.
         \begin{align}
             \begin{split} \label{eq:sobelgx}
@@ -88,8 +81,7 @@ floor height based on the terrain is described.
     
     
     \noindent
-    with \(x\) and \(y\) being the indices of the cell whose score is currently being evaluated, \(\boldsymbol{h}\) the
-    heightmap and \(C_p\) the score's weighting constant.
+    with \(x\) and \(y\) being the indices of the cell whose score is currently being evaluated, \(\boldsymbol{h}\), the ,heightmap and \(C_p\) the score's weighting constant.
     
     A diagrammatic, sliced, representation of the proximity score can be seen in Figure \ref{fig:prox_score_diagram}. The
     slice is taken along the x axis of the heightmap.
@@ -103,26 +95,13 @@ floor height based on the terrain is described.
     \end{figure}
 
     \subsection{Constraints}
-    It is important to constrain the possible anchor points to confer to the stability triangle,
-    meaning that the centre of mass of the robot must be inside the triangle formed by the three
-    anchor points. Additionally, it is important that the points selected are not too far away,
-    both in the horizontal and vertical direction for the robot to reach.
+    It is important to constrain the possible anchor points to conform to the stability triangle, meaning that the centre of mass of the robot must be inside the triangle formed by the three anchor points. Additionally, it is important that the points selected are not too far away, both in the horizontal and vertical direction for the robot to reach.
 
 
 \section{Score Search Algorithm} \label{sec:radial_search}
     Once the heightmap has been processed into the score map, which is done by adding the
-    slope score and terrain proximity score, the point with the best score must be found for every
-    initial anchor point.
-    The resolution of the heightmap is not very high and the adjusted anchor point is not
-    allowed to deviate too far from the initial anchor point, additionally due to the parallel nature
-    of the heightmap generation it is possible to score the entire heightmap with minimal cost.
-    Thus, it was decided to not employ an optimisation algorithm, such as gradient decent or
-    Bayesian, but rather to use a radial search algorithm. This algorithm progressively expands
-    its searching radius over the square score grid until a valid score is found, at which point it
-    terminates, thus ensuring that the closest valid point to the initial anchor point is selected.
-    See Figure \ref{fig:score_search} for a diagram representing the search pattern for a 5 grid squares search area.
-    Note that this search pattern will become inaccurate for large search areas, as the pattern steps
-    in a square manner. This however is not much of a concern for smaller search areas.
+    slope score and terrain proximity score, the point with the best score must be found for every initial anchor point. The resolution of the heightmap is not very high and the adjusted anchor point is not allowed to deviate too far from the initial anchor point. Additionally, due to the parallel nature of the heightmap generation, it is possible to score the entire heightmap with minimal cost. Thus, it was decided to not employ an optimisation algorithm, such as gradient decent or Bayesian, but rather to use a radial search algorithm. This algorithm progressively expands its searching radius over the square score grid until a valid score is found, at which point it
+    terminates, thus ensuring that the closest valid point to the initial anchor point is selected. See Figure \ref{fig:radial_search} for a diagram representing the search pattern for a 5 grid squares search area. Note that this search pattern will become inaccurate for large search areas, as the pattern steps in a square manner. This however is not much of a concern for smaller search areas.
 
     \captionsetup[figure]{oneside,margin={0cm,0cm}}
     \begin{figure}[h]
@@ -133,16 +112,11 @@ floor height based on the terrain is described.
     \end{figure}
 
     \section{Floor Height Adjustment} \label{sec:height_adjust}
-    After the horizontal position of the feet have been optimised, the height of the foot is simply set to the height of the
-    terrain at the target horizontal coordinates. This ensures that the robots body remains level and at a constant global height.
+    After the horizontal position of the feet have been optimised, the height of the foot is simply set to the height of the terrain at the target horizontal coordinates. This ensures that the robots body remains level and at a constant global height.
 
-    It is however important to adjust the reference floor height that the robot uses, if this is not done, then the robot will be
-    incapable of surmounting terrain higher than its commanded standing height, as the robot will simply maintain said height and walk into the tall terrain.
-    There are various methods to choosing a floor height, from using 
-    a time of flight sensor underneath the robots main body to using height data from the heightmap.
+    It is however important to adjust the reference floor height that the robot uses to adapt to a varying average terrain height. If this is not done, then the robot will be incapable of surmounting terrain higher than its commanded standing height, as the robot will simply maintain said height and walk into the tall terrain. There are various methods to choosing a floor height, from using a time of flight sensor underneath the robots main body to using height data from the heightmap.
 
-    The method that was implemented in this paper uses the average of three highest target positions out of all the robots legs.
-    This allows the robot to preemptively increase ore decrease its floor hight as it targets to step onto higher or lower terrain.
+    The method that was implemented in this project uses the average of the three highest target foot placement positions out of all the robots legs. This allows the robot to pre-emptively increase or decrease its floor height as it targets to step onto higher or lower terrain.
 
     \captionsetup[figure]{oneside,margin={0cm,0cm}}
     \begin{figure}[h]
@@ -152,15 +126,12 @@ floor height based on the terrain is described.
         \label{fig:floor_height}
     \end{figure}
 
-    While this method works well to preemptively adjust height and to optimise the body height against foot height, it does present one problem. If there is a tall piece of terrain in the path of the robots body
-    without any feet positioned on it, then the robot will not adjust its body height to clear this piece of terrain. 
-    Thus, the bounding box of the robots body, excluding the legs and feet, is checked against the heightmap
-    and if anywhere in the bounding box is higher than the previously set floor height, the floor height is adjusted to this new value.
+    \noindent
+    While this method works well to pre-emptively adjust height and to optimise the body height relative to the foot height, it does present one problem: If there is a tall piece of terrain in the path of the robot's body without any feet positioned on it, then the robot will not adjust its body height to clear this piece of terrain. Thus, the bounding box of the robot's body, excluding the legs and feet, is checked against the heightmap. If any point on the heightmap, that is inside the bounding box, is higher than the previously set floor height, the floor height is updated to this increased height.
 
     \newpage
-    \section{Scoring Test} \label{sec:test_scores}
-    For testing the walkability scores described in section \ref{sec:scores}, a piece of terrain that demonstrates various types of obstacles
-    that the robot might encounter was chosen, this terrain and its heightmap is shown in figure \ref{fig:score_test_map}.
+    \section{Scoring Test on Simulated Terrain} \label{sec:test_scores}
+    For testing the walkability scores described in section \ref{sec:scores}, a piece of terrain that demonstrates various types of obstacles that the robot might encounter was simulated. This terrain and its heightmap is shown in figure \ref{fig:score_test_map}.
     \begin{figure}[h]
         \centering
         \begin{subfigure}{.5\textwidth}
@@ -178,9 +149,7 @@ floor height based on the terrain is described.
     \end{figure}
 
     \noindent
-    The heightmap in figure \ref{fig:sub_3d_terrain_hmap} is used to test the various walkability scores, first, in order to show individual results,
-    the slope and edge proximity score is applied to the heightmap separately from each other, this is shown in figure \ref{fig:scores_seperate}. Next the combined score is
-    shown in figure \ref{fig:full_score}, this is the score that is used to optimise foot end positions.
+    The heightmap in figure \ref{fig:sub_3d_terrain_hmap} is used to test the various walkability scores. First, in order to show individual results, the slope and edge proximity scores are applied to the heightmap separately. This is shown in figure \ref{fig:scores_seperate}. Next the combined score is shown in figure \ref{fig:full_score}. This is the score that is used to optimise foot end positions.
     \begin{figure}[h]
         \centering
         \begin{subfigure}{.45\textwidth}
@@ -196,14 +165,16 @@ floor height based on the terrain is described.
         \caption{Slope score and edge proximity score tests.}
         \label{fig:scores_seperate}
     \end{figure}
-    The slope score can be seen in figure \ref{fig:sub_slope_test}, from this it can be seen that the slope score successfully indicates sloped areas
+    The score images show a gradient from black to white, darker colours indicate more desirable foot placement positions, while light colors indicate undesirable locations.
+
+    The slope score can be seen in figure \ref{fig:sub_slope_test}. From this it can be seen that the slope score successfully indicates sloped areas
     as less suitable foot end positions. It is also clear that vertical inclines are strongly discouraged, and while not the primary purpose of the slope
     score, this is expected and does not have a negative impact on scoring.
 
     Figure \ref{fig:sub_prox_test} shows that edge proximity score successfully discourages foot placement in areas with large height deviations,
     while allowing placement in areas with a locally similar slope, such as the ramp in the bottom-right. As can be seen from the larger, and more intense, discourage areas around the boxes in the
     top-right, bottom-right, left and bottom-left, it is clear that the magnitude of the height differential will increase the size and strength of the rejection area.
-    Next, in figure \ref{fig:full_score} the combined slope and edge proximity scores can be seen. This is simply a weighted addition of the two scores.
+    Next, in figure \ref{fig:full_score} the combined slope and edge proximity scores can be seen. This is simply the sum of the two scores.
     \begin{figure}[h]
         \centering
         \includegraphics[width=.49\textwidth]{fullScore.png}
@@ -212,8 +183,7 @@ floor height based on the terrain is described.
     \end{figure}
 
     \noindent
-    Finally, the radial search algorithm described in section \ref{sec:radial_search} is used to optimise various nominal foot end positions.
-    This is shown in figure \ref{fig:optimisation_test}.
+    Finally, the radial search algorithm described in section \ref{sec:radial_search} is used to optimise various nominal foot end positions. This is shown in figure \ref{fig:optimisation_test}. In this figure the blue box indicates the search area of the radial search algorithm from section \ref{sec:radial_search}. The red marker indicates the nominal foot position that would be received from the baseline motion system, and the green marker is the walkability score optimised foot position. If there is only a green marker this means that the nominal position was already valid, and no adjustment is necessary.
     \newpage
     \begin{figure}[h]
         \centering
@@ -223,23 +193,16 @@ floor height based on the terrain is described.
     \end{figure}
 
     \noindent
-    If the nominal foot position is in an acceptable position, the position will not be further optimised, this can be seen with the left most
-    nominal position in figure \ref{fig:optimisation_test}. If however the nominal position is too close to an edge, such as with the top-right example, 
-    the nominal position is optimised to the closest acceptable position. The optimised position does not need to have a perfect score, as can be seen in the bottom-right example, this example is similar to 
-    the aforementioned top-right, but it adjusts onto the ram, which has a non-perfect, however acceptable, walkability score.
-    Next the right most example shows how the nominal position is place on a piece of terrain that is too steep, this it is optimised onto the flat surface on top of the round pedestal. 
+    If the nominal foot position has an acceptable score, the position will not be adjusted. This can be seen with the middle-left nominal foot placement position in figure \ref{fig:optimisation_test} where the green marker coincides with the red marker. If however the nominal placement position is too close to an edge, such as with the top-right example, the nominal position is adjusted to the closest acceptable position. The adjusted position does not need to have a perfect score, as illustrated by the bottom-right example. This example is similar to the top-right example, with the nominal foot placement located too close to an edge. However, it adjusts the foot placement onto the ramp, which has a non-zero, but acceptable, walkability score. Next, the middle-right example shows how the nominal placement position is placed on a piece of terrain that is too steep. Thus, it is adjusted onto the flat surface on top of the round pedestal. 
     
     % \noindent
-    Finally, the top-left and bottom-left examples show the case of a nominal position placed on a sloped pillar and a sloped hole respectively.
-    In both cases the nominal position is optimised to the flat surface at the to of the pillar and at the bottom of the hole.
+    Finally, the top-left and bottom-left examples show the cases of nominal foot placement positions placed on a sloped pillar and a sloped hole, respectively. In both cases the nominal placements are adjusted to the flat surface at the top of the pillar and at the bottom of the hole respectively. (The foot could be placed at the bottom of the hole, because the height there is known.).
     
-    The flat surfaces on the pillar an in the hole are large enough to not be rejected by the edge proximity score, however, if the inclines sere steeper or the flat surface smaller it is possible that these nominal positions would be
-    unsolvable, as there is no appropriate foot end placement inside the search radius. In this case the robot would need to make a course adjustment.
+    The flat surfaces on the pillar an in the hole are large enough not to be rejected by the edge proximity score. However, if the slopes were steeper or the flat surfaces were smaller, these nominal positions could be unsolvable, as there would be no suitable foot placement positions inside the search area. In this case the robot would need to make a course adjustment.
 
     \newpage
-    \subsection{Hardware Scoring Test}
-        Using the same colour scheme as above, the hardware heightmap found in section \ref{sec:hardware_hmap} is shown in figure \ref{fig:harware_hmap}. The scoring system is then
-        applied to this heightmap as shown in figure \ref{fig:hardware_score_map}.
+    \subsection{Scoring Test on Physical Terrain}
+        The walkability scoring system was also tested on the practical heightmap that was generated from real RGB-D images recorded by the physical hexapod. Using the same colour scheme as above, the practical heightmap found in section \ref{sec:hardware_hmap} is again shown for reference in figure \ref{fig:harware_hmap}. The scoring system was then applied to this heightmap and the resulting walkability score map is shown in figure \ref{fig:hardware_score_map}.
         \begin{figure}[h]
             \centering
             \begin{subfigure}{.45\textwidth}
@@ -257,15 +220,9 @@ floor height based on the terrain is described.
         \end{figure}
 
         \noindent
-        As can be seen from figure \ref{fig:hardware_hmap_scoremap} the scoring system applied to the hardware generated heightmap generates
-        similarly to when it is applied to a ideal heightmap. The primary difference that should be noted is the score artifacts created around
-        the mapped areas edge, seen as a outline around the mapped area. Additionally to the outline around the mapped area, within the mapped area
-        light score lines can be seen. These lines are most clear on the portion of flat terrain. The lines are created by the moving field of vision
-        and inaccuracies in the position, mostly height, estimation, as explained previously in section \ref{sec:hardware_hmap}.
+        As can be seen from figure \ref{fig:hardware_hmap_scoremap} the scoring system applied to the hardware-generated heightmap functions similarly to when it is applied to a simulated heightmap. The primary difference that should be noted is the score artifacts created around the mapped areas edge, seen as an outline around the mapped area. Light score lines can also be seen as diagonal stripes within the mapped area. These lines are most clear on the portion of flat terrain. The lines are created by the moving field of vision and inaccuracies in the pose estimate obtained from ORB-SLAM3, mostly inaccuracies in the height estimates, as explained previously in section \ref{sec:hardware_hmap}.
 
-        It should also be noted that while the score for the sloped plane at the top of the heightmap is not as even as it was in the ideal heightmap,
-        even with these undulations present it is still sufficiently accurate for the correct foot position correction to be mad.
-        This can be seen in figure \ref{fig:hardware_test_points} which shows a couple of nominal test points applied to the hardware generated score map.
+        It should also be noted that, while the score for the sloped plane at the top of the heightmap is not as even as it was in the ideal heightmap, even with these undulations present it is still sufficiently accurate for the correct foot position adjustment to be made. This can be seen in figure \ref{fig:hardware_test_points} which shows how different hypothetical nominal foot placement positions would be adjusted based on the hardware-generated score map.
 
         \newpage
         \begin{figure}[h]
@@ -276,12 +233,10 @@ floor height based on the terrain is described.
         \end{figure}
 
         \noindent
-        As expected, the test points applied to the hardware score map behaves similarly the the ideal case shown in figure \ref{fig:optimisation_test},
-        with all the nominal points being adjusted to appropriate new positions. Note the point applied to the sloped plane at the top of the map is adjusted
-        appropriately even with the slightly undulating score map across the sloped area.
+        The results show that all of the nominal foot placements are adjusted to suitable new placement positions, where necessary. Note the point applied to the sloped plane at the top of the map is adjusted appropriately even with the slightly undulating score map across the sloped area.
 
         Additionally, it should be noted that while some of the outlining artifacts do grow large enough to affect the final foot positions, as can be seen in the
-        left most test point, these effects are generally not large enough to warrant concern.
+        left most test point, these effects are generally not large enough to be of  concern.
 
 
 % \bigskip
