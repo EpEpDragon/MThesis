@@ -5,7 +5,9 @@
     % are also graphed, however only the height of a single foot will be graphed, this is to maintain clarity.
 
     \section{Flat Terrain}
-    The flat plane test aims to quantify nominal body height oscillations and to provide a baseline to compare subsequent test to. Figure \ref{fig:plane_test} and \ref{fig:plane_test_data} shows the test results of walking over a simple flat plane, as expected the the step sizes and arcs are uniform with no optimisation necessary.
+    The flat plane test aims to quantify nominal body height oscillations and to provide a baseline to compare subsequent test to. The test was performed with a nominal stride length of 15cm, while the flow function parameters \(Ch\) and \(q\) were set to 2.0 and 14.0 respectively. This equates to a desired step height roughly equal to true stride lenght, which is dependant on the terrain. The target body height was set to \(9cm\) above the terrain. The only commands given to the robot was to walk forwards at a consant speed. Figure \ref{fig:plane_test} shows screenshots of the simulation test being performed in \ac{mujoco}. A video of the simulation can be seen \hyperlink{}{here}.
+
+    \newpage
     \begin{figure}[h]
         \centering
         \includegraphics[width=.7\textwidth]{WalkTestPlane.png}
@@ -21,12 +23,11 @@
     \end{figure}
     
     \noindent
-    From figure \ref{fig:plane_test_data} it can be seen that there is a constant error of about 1cm in the body height of the robot, this can be easily solved by adding a constant offset or adding integral 
-    control to the leg servos. It is also clear that as the robot walks there are some oscillations in the body height, this is to be expected and the oscillations are lower than the \(10\%\) desired body height specification.
-        
-    Next it can be seen that the tilt of the body, in both roll and pitch, tends to stay below \(0.5^\circ\), which is well within specifications. It is also possible to further improve
-    the tilt error by incorporating accelerometer based feedback control to the feet heights. Finally, the height of one of the legs are shown, from this it is clear that the robot takes
-    uniform, stable steps.
+    The simulation results are show in Figure \ref{fig:plane_test_data}. It can be seen that the stride length is roughly equal to the set stride of \(15cm\). The step height is roughly \(10cm\) which is lower than 
+    
+    It can be seen that there is a constant error of about 1cm in the body height of the robot. The reason for this is that there is no body height feedback control, as such, errors in the servos accumulate to result in the body height error. This can be easily solved by adding a constant offset or by adding feedback control for the body height. It is also clear that as the robot walks there are some oscillations in the body height. This is to be expected as the servos are not modeled as having infinite torque, thus, the robot will sag when three legs are lifted off the ground, and rebound once those legs are placed on the floor again. Similarly to the body height error, adding feedback control on the body height would reduce these oscillations. The amplitude of the oscillations are lower than the \(10\%\) of the desired body height, which is acceptable. 
+
+    Next, it can be seen that the tilt of the body also exhibit small oscillations, in both roll and pitch. However, the amplitudes of these oscillations remain below 0.5 degrees. Finally, the height of one of the legs are shown, from this it is clear that the robot takes uniform, stable steps.
 
     \newpage
     \section{Staircase}
@@ -74,8 +75,14 @@
     \end{figure}
     \begin{figure}[h]
         \centering
-        \includegraphics{data_org.pdf}
-        \caption{Body height (top). Body tilt (center). Position of one foot (bottom)}
+        \includegraphics{cobble_test_feet.pdf}
+        \caption{Feet top view (Top). Feet side view (Bottom)}
+        \label{fig:org_test_data}
+    \end{figure}
+    \begin{figure}[h]
+        \centering
+        \includegraphics{cobble_test_body.pdf}
+        \caption{Body height (Top). Body tilt (Bottom)}
         \label{fig:org_test_data}
     \end{figure}
 
