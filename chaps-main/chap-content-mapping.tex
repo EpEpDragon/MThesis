@@ -57,10 +57,10 @@
                 0        & 0        & 1
             \end{bmatrix}
         \end{equation}
-        with the focal length represented by,
+        with the focal lengths in pixels represented by,
         \[\alpha_x = f \cdot m_y\]
         \[\alpha_y = f \cdot m_x\]
-        where \(m_x\) and \(m_y\) are the inverse of the width and height of a image plane pixel, \(f\) is the focal length, and \((u_0,v_0)\) is the principal point, ideally located at the center of the image plane. The skew coefficient, \(\gamma\), is often, and in this case, 0.
+        where \(m_x\) and \(m_y\) are the inverse of the width and height of a image plane pixel, \(f\) is the focal length in millimeters, and \((u_0,v_0)\) is the principal point, ideally located at the center of the image plane. The skew coefficient, \(\gamma\), is often, and in this case, 0.
 
         The extrinsic matrix is defined below
         \begin{equation}\label{eq:extrinsic}
@@ -116,13 +116,13 @@
         The 3D positions in the camera frame can be converted to the corresponding 3D positions in the map frame, as follows:
         \begin{align} \label{eq:camera_to_map}
             \begin{split}
-                \bm{p}\inrefframe{\fworld} &= \transframe{\bm{x}\inrefframe{\fcamera}}{\fcamera}{\fworld}\\ 
+                \bm{p}\inrefframe{\fworld} &= \transframe{\bm{p}\inrefframe{\fcamera}}{\fcamera}{\fworld}\\ 
                 &= \bm{q}_{\fcamera\fworld} \cdot \bm{p}\inrefframe{\fcamera} \cdot \bm{q}_{\fcamera\fworld}{-1} + \bm{p}\inrefframe{\fworld}_{C0}
             \end{split}
         \end{align}
 
         \noindent
-        where \(\boldsymbol{p}\inrefframe{\fmap}\) is the position in the world frame, \(\boldsymbol{q}_{\fcamera\fworld}\) is the quaternion rotation of the world frame relative to the camera frame, and \(\boldsymbol{p}\inrefframe{\fmap}_{C0}\) is the position of the camera frame's origin in the world frame.
+        where \(\boldsymbol{p}\inrefframe{\fworld}\) is the position in the world frame, \(\boldsymbol{q}_{\fcamera\fworld}\) is the quaternion rotation of the world frame relative to the camera frame, and \(\boldsymbol{p}\inrefframe{\fworld}_{C0}\) is the position of the camera frame's origin in the world frame.
 
     \newpage
     \section{Updating the Heightmap}
@@ -143,7 +143,7 @@
                 j &= \lfloor y\inrefframe{\fworld} \Delta \rfloor \mod{N}
             \end{split}
         \end{align}
-        where \([x\inrefframe{\fworld}, y\inrefframe{\fworld}]\) are the horizontal coordinates in the world frame, \(\Delta\) is the horizontal resolution of the heightmap, and \(N\) is the side length of the 2D array that stores the heightmap.
+        where \([x\inrefframe{\fworld}, y\inrefframe{\fworld}]\) are the horizontal coordinates in the world frame, \(\Delta\) is the scaling of the heightmap, and \(N\) is the side length of the 2D array that stores the heightmap.
         
     \newpage
     \section{GPU Compute Pipeline}
@@ -179,8 +179,7 @@
             % \noindent
             While threads can directly communicate with each other within the same workgroup, direct communication across workgroups is impossible. If cross workgroup communication is desired, this must be performed using \ac{gpu} buffers, which are slower to access. Therefore, the processes were designed to operate fully independently from each other. Of course, data transfer between the \ac{cpu} and the \ac{gpu} is orders of magnitudes slower than accessing local buffers. For this reason, all communication between the \ac{cpu} and \ac{gpu} is kept to a minimum.
             
-            Finally, it should be noted that, while it is possible to vary \(\bm{n_w}\) with each execution cycle, \(\bm{N_l}\) is a constant specified at compile time,
-            and as such the number of threads per workgroup cannot be altered during operation.
+            Finally, it should be noted that, while it is possible to vary \(\bm{n_w}\) with each execution cycle, \(\bm{N_l}\) is a constant specified at compile time, and as such the number of threads per workgroup cannot be altered during operation.
 
     \newpage
     \section{Simultaneous Localisation and (Sparse) Mapping} \label{sec:orbslam3}
@@ -190,9 +189,56 @@
 
     In this project ORB-SLAM3 is executed as a separate \ac{ros} node. This isolates ORB-SLAM3 from the rest of the system maximising modularity. The \ac{ros} node is subscribed to the color and depth streams originating from the \ac{rgbd} camera. The color and depth streams are used as inputs to the tracking function, which performs localisation. The tracking function then outputs the pose estimate, which is immediately published, with the same timestamp as the depth image attached. This is to ensure that the pose estimate and depth image used in generating the dense-map are synchronised.
 
+    \section{Simulated Mapping Test}\label{sec:sim_hmap}
+        The mapping system decribed above was tested in the \ac{mujoco} simulation environment. This mapping test aimed to show how the hexapod maps terrain while in motion. Figure \ref{fig:sim_hmap_terrain} shows the terrain that was used in this test.
+        \vspace{0.5cm}
+        
+        \begin{centering}
+            \includegraphics[width=0.8\textwidth]{SimHmapTerrain.png}
+            \captionof{figure}{Simulated terrain used for the test.}
+            \label{fig:sim_hmap_terrain}
+        \end{centering}
+        
+        \noindent
+        The test consisted of the robot walking past a cobblestone-like terrain, while simultaneously generating a heightmap. Figures \ref{fig:sim_hmap_start} to \ref{fig:sim_hmap_end} show how the camera view and associated heightmap generated at the start, middle and end of the test. Please see \href{https://youtu.be/EgFnK6jmhdc}{this video} of the simulated test. 
+
+        As can be seen from figure \ref{fig:sim_hmap_start} the map is initially empty, with only a small portion of the cobble visible. Also note that the hexapod legs are filtered out of the heightmap.
+        \begin{figure}[h]
+            \centering
+            % \hspace{-0.8cm}
+            \includegraphics[width=.6\textwidth]{Color0.png}
+            \includegraphics[width=.9\textwidth]{hmap0.pdf}
+            \caption{Simulated. Colour frame at the start of walking path (Top). Heightmap generated at the start of the walking path (Bottom).}
+            \label{fig:sim_hmap_start}
+        \end{figure}
+
+        \noindent
+        Next, in figure \ref{fig:sim_hmap_middle}, a larger part of the cobblestone is visible on the heightmap. The final piece of the cobble is still not visible however. Part of the cobblestone, most notably the area around \(-100cm\) in the X axis, is not visible even though the camera is pointed there. This is due to the tall piece of terrain obscuring the camera's view. Also note how the heightmap has wrapped around to the opposite side of the buffer as the robot walked towards the right.
+        \begin{figure}[h]
+            \centering
+            % \hspace{-0.8cm}
+            \includegraphics[width=.6\textwidth]{Color2.png}
+            \includegraphics[width=.9\textwidth]{hmap1.pdf}
+            \caption{Simulated. Colour frame at the middle of walking path (Top). Heightmap generated at the middle of the walking path (Bottom).}
+            \label{fig:sim_hmap_middle}
+        \end{figure}
+        
+        \newpage
+        \noindent
+        Finally, in figure \ref{fig:sim_hmap_end}, the entire length of cobblestone surface is visible. The obscured part of the terrain from figure \ref{fig:sim_hmap_middle} was also filled in as the camera moved around the tall piece of terrain.
+        \begin{figure}[h]
+            \centering
+            % \hspace{-0.8cm}
+            \includegraphics[width=.6\textwidth]{Color4.png}
+            \includegraphics[width=.9\textwidth]{hmap2.pdf}
+            \caption{Simulated. Colour frame at the end of walking path (Top). Heightmap generated at the end of the walking path (Bottom).}
+            \label{fig:sim_hmap_end}
+        \end{figure}
+
+
     \newpage
     \section{Hardware Mapping Test}\label{sec:hardware_hmap}
-        The mapping system described above was tested on the physical robot. This mapping test aimed to show how the physical hexapod maps various objects while in motion. The test consisted of the robot walking past various obstacles, while simultaneously generating a heightmap.
+        The mapping system was also tested on the physical robot. This mapping test aimed to show that the physical hexapod is also capable of mapping various objects while in motion. The test consisted of the robot walking past various obstacles, while simultaneously generating a heightmap.
 
         Figure \ref{fig:hardware_map_diag} shows a top-down diagram of the placed obstacles used in this test, with the path the robot walks.
         \begin{figure}[h]
@@ -204,9 +250,7 @@
 
         \noindent
         The test objects were selected to show a variety of obstacle types, with a variety of heights, that the robot might encounter, including sloped objects, spherical objects, objects with holes, and irregular objects.
-
-        Figures \ref{fig:hardware_hmap_start}, \ref{fig:hardware_hmap_mid} and \ref{fig:hardware_hmap} show the heightmap, and its corresponding color frame, at the start middle and end of the
-        robot's walking path. Please see \hyperlink{}{this video} of the test from the robot's perspective.
+        Figures \ref{fig:hardware_hmap_start}, \ref{fig:hardware_hmap_mid} and \ref{fig:hardware_hmap} show the heightmap, and its corresponding color frame, at the start middle and end of the robot's walking path. Please see \href{https://youtu.be/AWgku4sVu5w}{this video} of the test from the robot's perspective.
         
         \newpage
         \noindent
@@ -217,7 +261,7 @@
             \hspace{-0.8cm}
             \includegraphics[width=.6\textwidth]{color_start.jpeg}
             \includegraphics[width=.9\textwidth]{hmap_start.pdf}
-            \caption{Colour frame at the start of walking path (Top). Heightmap generated at the start of the walking path (Bottom).}
+            \caption{Hardware. Colour frame at the start of walking path (Top). Heightmap generated at the start of the walking path (Bottom).}
             \label{fig:hardware_hmap_start}
         \end{figure}
         
@@ -231,30 +275,28 @@
             \hspace{-0.8cm}
             \includegraphics[width=.6\textwidth]{color_half.jpeg}
             \includegraphics[width=.9\textwidth]{hmap_half.pdf}
-            \caption{Colour frame at the middle of walking path (Top). Heightmap generated at the middle of the walking path (Bottom).}
+            \caption{Hardware. Colour frame at the middle of walking path (Top). Heightmap generated at the middle of the walking path (Bottom).}
             \label{fig:hardware_hmap_mid}
         \end{figure}
 
         \noindent
-        In this heightmap however, noise is more prevalent, this is particularly visible when looking at the floor height, where distinct lines can be observed.
-        These lines are the edge of the field of vision of the camera which is being moved to the right, and is caused by inaccuracies in the position estimation.
-
+        In figure \ref{fig:hardware_hmap_mid} however, noise is more prevalent, this is particularly visible when looking at the floor height, where distinct lines can be observed. These lines are the edge of the field of vision of the camera which is being moved to the right, and is caused by inaccuracies in the position estimation.
         \begin{figure}[h]
             \centering
             \hspace{-0.8cm}
             \includegraphics[width=.6\textwidth]{color.jpeg}
             \includegraphics[width=.9\textwidth]{hmap.pdf}
-            \caption{Colour frame at the end of walking path (Top). Heightmap generated at the end of the walking path (Bottom).}
+            \caption{Hardware. Colour frame at the end of walking path (Top). Heightmap generated at the end of the walking path (Bottom).}
             \label{fig:hardware_hmap}
         \end{figure}
+        As the previous, simulated, test has much more robust access to the robot's position, these types of artifacts were not present.
 
-        \noindent
         Finally, the heightmap generated at the end of the walking path can be seen in figure \ref{fig:hardware_hmap}. In this heightmap the shadows cast have been shrunk even more, and some additional objects became visible. The original objects are also now out of vision, but they persist on the heightmap. 
 
         Figure \ref{fig:hardware_pos}  show the pose estimate provide by the ORB-SLAM3 system during the hardware test, with each dot being an estimate. The blue dot indicates the start of the test and the red dot indicates the end of the test.
         \begin{figure}[h]
             \centering
-            \includegraphics{pos.pdf}
+            \includegraphics[height=12.7cm]{pos.pdf}
             \caption{Pose estimate output from ORB-SLAM3}
             \label{fig:hardware_pos}
         \end{figure}

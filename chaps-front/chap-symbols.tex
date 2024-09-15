@@ -3,25 +3,60 @@
 
 \begin{Nomencl}[2.75cm]
 \NomGroup{Constants}%-----------------------------------------------
-    \item[$L_0$] \qty{300}{mm}
-
-\NomGroup{Variables}%-----------------------------------------------
-    \item[$\mathit{Re}_\mathrm{\,D}$]
-                       \UnitLine{Reynolds number (diameter)}{~}
-    \item[$x$]         \UnitLine{Coordinate                }{m}
-    \item[$\ddot{x}$]  \UnitLine{Acceleration              }{m/s^2}\\
+    \item[$\alpha_x$] \UnitLine{Focal length in x-direction }{302px}
+    \item[$\alpha_y$] \UnitLine{Focal length in y-direction }{302px}
+    \item[$u_0$] \UnitLine{Principal point x-coordinate }{313px}
+    \item[$v_0$] \UnitLine{Principal point y-coordinate }{253px}
+    \item[$\gamma$] \UnitLine{Skew coefficient }{0}\\
+    \item[\(L1\)] \UnitLine{Hip length}{65cm}
+    \item[\(L2\)] \UnitLine{Femur lengt}{97cm}
+    \item[\(L3\)] \UnitLine{Tibula length}{145cm}
+    \item[\(\bm{T}\inrefframe{\fbody}\)] \UnitLine{Resting feet positions}{cm}
+    \item[\(\bm{Q_i}\inrefframe{\fbody}\)] \UnitLine{Base hip rotation quaternions}{~}\\
+    \item[\(\bm{K}\)] \UnitLine{Weighting kernel}{~}
+    \item[\(C_p\)] \UnitLine{Proximity score weight}{1}
+    \item[\(C_g\)] \UnitLine{Slope score weight}{1}
     
-    \item[$\theta$]    \UnitLine{Rotation angle            }{rad}
-    \item[$\tau$]      \UnitLine{Moment                    }{\newton\meter}
-
-\NomGroup{Vectors and Tensors}%-------------------------------------
-
+\NomGroup{Variables}%-----------------------------------------------
+    \item[\(\bm{p} \inrefframe{C}\)] \UnitLine{Depth buffer projected to 3D camera space}{cm}
+    \item[\(\bm{p}\inrefframe{\fworld}\)] \UnitLine{Depth buffer projected 3D camera spac}{cm}
+    \item[\(\bm{q}_{\fcamera\fworld}\)] \UnitLine{Quaternion rotation of the world frame relative to the camera}{~}
+    \item[\(\bm{p}\inrefframe{\fworld}_{C0}\)] \UnitLine{Position of the camera origin}{cm}\\
+    \item[\(\boldsymbol{p}\inrefframe{\fmap}_r\)] \UnitLine{Robot position in map space}{px}
+    \item[\(\delta\)] \UnitLine{Heightmap scaling}{~}
+    \item[\(N\)] \UnitLine{Heightmap size}{px}\\ 
+    \item[\(\bm{t}\inrefframe{\fleg}\)] \UnitLine{Target foot position in leg space}{cm}
+    \item[\(\Theta_1\)] \UnitLine{Required hip yaw angle}{rad}
+    \item[\(\Theta_2\)] \UnitLine{Required hip pitch angle}{rad}
+    \item[\(\Theta_3\)] \UnitLine{Required knee angle}{rad}
+    \item[\(\alpha\)] \UnitLine{Inner hip pitch angle}{rad}
+    \item[\(\beta\)] \UnitLine{Inner knee pitch angle}{rad}
+    \item[\(c\)] \UnitLine{Hip to foot direct distance}{cm}
+    \item[\(d\)] \UnitLine{Hip to foot horizontal distance}{cm}
+    \item[\(\bm{p}_f\inrefframe{\fleg}\)] \UnitLine{Current foot position in leg space}{cm} 
+    \item[\(\theta_1\)] \UnitLine{Current hip yaw angle}{rad}
+    \item[\(\theta_2\)] \UnitLine{Current hip pitch angle}{rad}
+    \item[\(\theta_3\)] \UnitLine{Current knee angle}{rad}\\
+    \item[\(\bm{m}\inrefframe{\fbody}\)] \UnitLine{Required move vectors for swinging feet}{cm}
+    \item[\(l_\text{str}\)] \UnitLine{Nominal stride lenght}{cm}
+    \item[\(\bm{\bm{w}_\text{dir}}\inrefframe{\fbody}\)] \UnitLine{Desired walking direction}{~}
+    \item[\(\bm{t_\text{nom}}\inrefframe{\fbody}\)] \UnitLine{Nominal feet targets in body space}{cm}
+    \item[\(\boldsymbol{t}_\text{opt}^\fbody\)] \UnitLine{Optimised feet targets in body space}{cm}
+    \item[\(\boldsymbol{t}_\text{prev}^\fbody\)] \UnitLine{Previous, optimised, feet targets in body space}{cm}
+    \item[\(\bm{t_\text{nom}} ^{\fmap}\)] \UnitLine{Nominal feet targets in map space}{cm}\\
+    \item[\(C_h\)] \UnitLine{Step height, as a function of stride length}{~}
+    \item[\(q\)] \UnitLine{Vertical rise of foot above target position}{mm}\\
+    \item[\(\bm{h}_{i,j}\)] \UnitLine{Heightmap}{cm}
+     
+    
 
 \NomGroup{Subscripts}%----------------------------------------------
-    \item[$\mathrm{a}$] Adiabatic
-    \item[$a$]          Coordinate
+    \item[\(i\)] Index
+    \item[\text{nom}] Nominal
+    \item[\text{opt}] Optimised
+    \item[\text{prev}] Previous
 \NomGroup{Superscripts}%----------------------------------------------
-    \item[\fworld] Indicates the world reference frame.\footnote{\label{note1}See appendix \ref{app:frames} for reference frame definitions.}
+    \item[\fworld] Indicates the world reference frame.\footnote{\label{note1}See appendix \ref{app:transforms} for reference frame definitions.}
     \item[\fbody] Indicates the robot body reference frame.\textsuperscript{\ref{note1}}
     \item[\fmap] Indicates the map reference frame.\textsuperscript{\ref{note1}}
     \item[\fcamera] Indicates the camera reference frame.\textsuperscript{\ref{note1}}
@@ -64,7 +99,7 @@
             \acro{lidar}[LiDAR]{Light Detection and Ranging}
             \acro{rgbd}[RGB-D]{Red Green Blue Depth}
             \acro{slam}[SLAM]{Simultaneous Localisation and Mapping}
-            \acro{imu}[IMU]{inertial measuring unit}
+            \acro{imu}[IMU]{Inertial Measuring Unit}
             \acro{rl}[RL]{Reinforcement Learing}
             \acro{ann}[ANN]{Artificial Neural Network}
             \acro{gps}[GPS]{Global Positioning System}
@@ -72,6 +107,9 @@
             \acro{mcu}[MCU]{Microcontroller Unit}
             \acro{gpu}[GPU]{Graphical Processing Unit}
             \acro{cpu}[CPU]{Central Processing Unit}
-            \acro{lps}[LPS]{local positioning system}
+            \acro{lps}[LPS]{Local Positioning System}
+            \acro{cpg}[CPG]{Central Pattern Generator}
+            \acro{vdp}[VDP]{Van der Pool}
+            \acro{viorb}[VIORB]{Visual Inertial ORB-SLAM}
         \end{acronym}       
     \end{minipage}

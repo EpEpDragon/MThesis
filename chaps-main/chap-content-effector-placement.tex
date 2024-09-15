@@ -81,7 +81,7 @@ This chapter describes the processes necessary for optimising the foot end posit
     
     
     \noindent
-    with \(x\) and \(y\) being the indices of the cell whose score is currently being evaluated, \(\boldsymbol{h}\), the ,heightmap and \(C_p\) the score's weighting constant.
+    with \(x\) and \(y\) being the indices of the cell whose score is currently being evaluated, \(\boldsymbol{h}\), the heightmap and \(C_p\) the score's weighting constant.
     
     A diagrammatic, sliced, representation of the proximity score can be seen in Figure \ref{fig:prox_score_diagram}. The
     slice is taken along the x axis of the heightmap.
@@ -201,7 +201,7 @@ This chapter describes the processes necessary for optimising the foot end posit
     The flat surfaces on the pillar an in the hole are large enough not to be rejected by the edge proximity score. However, if the slopes were steeper or the flat surfaces were smaller, these nominal positions could be unsolvable, as there would be no suitable foot placement positions inside the search area. In this case the robot would need to make a course adjustment.
 
     \newpage
-    \subsection{Scoring Test on Physical Terrain}
+    \section{Scoring Test on Physical Terrain}
         The walkability scoring system was also tested on the practical heightmap that was generated from real RGB-D images recorded by the physical hexapod. Using the same colour scheme as above, the practical heightmap found in section \ref{sec:hardware_hmap} is again shown for reference in figure \ref{fig:harware_hmap}. The scoring system was then applied to this heightmap and the resulting walkability score map is shown in figure \ref{fig:hardware_score_map}.
         \begin{figure}[h]
             \centering

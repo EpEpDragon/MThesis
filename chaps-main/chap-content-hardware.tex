@@ -4,8 +4,9 @@ This chapter describes the practical implementation of the system on the physica
 \section{Overview} \label{sec:hardware_overview}
 The entire system was implemented in the \acf{ros} environment, \ac{ros} is a system which, among other things, greatly simplifies the task of communication between devices using various different communication protocols. This is achieved by sectioning all code into different \ac{ros} nodes, where every node is treated as a component in a large network. All ros nodes are joined together by the core node, which is hosted at a set IP address on the network.
 
-\newpage
 \section{ROS Architecture} \label{sec:ros_nodes}
+    \ac{ros} operates by the concept of nodes, publishers and subscribers. A \ac{ros} node is a piece of code executed in the \ac{ros} network, publishers and subscribers are initialised by a node. A publisher will send a message into the \ac{ros} network, while a subscriber will listen for a certain message on the network. When a subscriber receives a message it will execute a user defined callback function to use the received data.
+
     The various \ac{ros} nodes are distributed between the base station on the desktop computer, and the Jetson Nano and the Teensy \ac{mcu} on the hexapod robot. Figure \ref{fig:nodes} provides an overview of the nodes and how they communicate with each other.
 
     \captionsetup[figure]{oneside,margin={0cm,0cm}}
@@ -70,7 +71,7 @@ The entire system was implemented in the \acf{ros} environment, \ac{ros} is a sy
 
         The hexapod hmap node is responsible for generating the heightmap and score maps. It subscribes to the pose, depth and color messages, the depth and color messages are downsampled before being used to generate the heightmap. The entire generation process is ran on the Jetson Nano's \ac{gpu} as described in chapter \ref{chap:mapping}. Once the heightmap and scoremap are generated they are published in the hmap data and scoremap data messages. Additionally the downsampled colour and depth messages are also published for transmission to the base station.
 
-        Next the hexapod movement node subscribes to the command, pose, hmap and scoremap messages to generate and optimise the feet targets, as described in chapter \ref{chap:motion} and \ref{chap:optimisation}. The feet targets are published as the effector targets message.
+        Next, the hexapod movement node subscribes to the command, pose, hmap and scoremap messages to generate and optimise the feet targets, as described in chapter \ref{chap:motion} and \ref{chap:optimisation}. The feet targets are published as the effector targets message.
 
         Lastly, the Teensy \ac{mcu} also consists of a single \ac{ros} node, the hexapod serial node. The functionality of this node is simply to facilitate communication over USB. The node is subscribed to the mode and effector targets messages, these messages are then used to calculate the feet trajectories as described in chapter \ref{chap:motion}. The trajectories are then translated into servo angles and angular rates, also described in chapter \ref{chap:motion}. Whereafter the servos are actuated. The only publisher present on the Teensy is the LOGDATA publisher, which simply publishes general string log messages for use by the operator.
     %     Table \ref{tab:jetson_pubs} to \ref{tab:teensy_subs} describe the \ac{ros} publishers and subscribers present on these two computational units.

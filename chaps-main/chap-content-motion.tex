@@ -1,7 +1,5 @@
 \chapter{Baseline Motion System} \label{chap:motion}
-    This chapter covers the systems governing the baseline motion of the robot, meaning the motion over simple flat terrain. 
-    First the kinematics of the robot are defined, next the walking gait state machine is
-    described, and finally the equations to defining a foots path of motion is described. An overview of these systems can be seen in figure \ref{fig:motion_system}.
+    This chapter covers the systems governing the baseline motion of the robot, meaning the motion over simple flat terrain. First the kinematics of the robot are modelled, Next the walking gait state machine is described. And finally, the equations to define a foot's path of motion is described. An overview of these systems can be seen in figure \ref{fig:motion_system}.
     \begin{figure}[h]
         \centering
         % \hspace{-1.38cm}
@@ -11,35 +9,24 @@
     \end{figure}
     \section{Overview}
         % This chapter describes the systems governing the motion of the robot, such as leg motion planning and gait generation.
-        The basic operation of the motion system is as follows, first the robot is commanded to walk in a certain direction, at a
-        certain speed and body height. These commands are sent from the base station to Jetson Nano on the robot,
-        the motion controller node on the Jetson Nano then sends these commands to the gait state machine node, at a fixed frequency.
-        The gait state machine uses the received direction stride length to generate leg states (swinging or supporting) and the ideal
-        final position of each foot. These states and positions are sent back to the motion controller node where the positions are adjusted
-        based on the heightmap data to ensure stable footing. The leg states and adjusted feet positions are then sent to the servo 
-        controller node, this node controls the servos to move the robots feet to their final positions, either in a arc or linearly,
-        depending on their state (swinging or supporting). %A high level diagram of the motion system can be seen in \ref{fig:motion_system}.
+        The basic operation of the motion system is as follows: First the robot is commanded to walk in a certain direction, at a certain speed, and with a certain body height. These commands are sent from the base station to the Jetson Nano on the robot. The motion controller node on the Jetson Nano then sends these commands to the gait state machine node, at a fixed frequency. The gait state machine uses the received direction and stride length to generate leg states (swinging or supporting) and the ideal final position of each foot. These states and positions are sent back to the motion controller node where the positions are adjusted based on the heightmap data to ensure stable footing. The leg states and adjusted feet positions are then sent to the servo 
+        controller node. This node controls the servos to move the robots feet to their final positions, either in a arc or linearly, depending on their state (swinging or supporting). %A high level diagram of the motion system can be seen in \ref{fig:motion_system}.
 
     \section{Kinematics}
-        When commanding a foot position, the servo controller requires a function to calculate servo angles. While the foot arc planner, see section 
-        \ref{sec:arc_generation}, requires the current position of the feet to function. The \ac{ik} and \ac{fk} functions described in this section provide
-        this functionality. 
+        When commanding a foot position, the servo controller requires a function to calculate servo angles. While the foot arc planner, which will be described in section \ref{sec:arc_generation}, requires the current position of the feet to function. The inverse and forward kinematic functions described in this section provide this functionality. 
         
         \subsection{Coordinate Frames}
-            The coordinate frames relevant to the kinematics of the robot are the body coordinate frame, \fbody, and the leg frame, \fleg. All foot targets/positions are specified
-            if the body coordinate frame, while the kinematic systems operate in the leg coordinate frame. Thus a conversion from the body to leg frames is required. 
-            Figure \ref{fig:coords_top} show the world, body and multiple leg coordinate frames.
+            The coordinate frames relevant to the kinematics of the robot are the body coordinate frame, \fbody, and the leg frames, \fleg. All foot targets/positions are specified in the body coordinate frame, while the kinematic systems operate in the leg coordinate frames. Thus conversions from the body to leg frames are required. Figure \ref{fig:coords_top} shows the world, body, and leg coordinate frames.
             \begin{figure}[h]
                 \centering
                 % \hspace{-1.38cm}
-                \includegraphics[width=.7\textwidth]{Diagrams-BodyFrame.drawio.pdf}
+                \includegraphics[width=.68\textwidth]{Diagrams-BodyFrame.drawio.pdf}
                 \caption{World, body and leg coordinate frames.}
                 \label{fig:coords_top}
             \end{figure}
 
             \noindent
-            The leg coordinate systems are simply rotated and shifted from the body coordinate system. This transformation,\transframe{\bm{x}^\fbody}{\fbody}{\fleg} is defined by equation \ref{eq:body_to_leg},
-            further explained explained in appendix \ref{app:transforms}.
+            The leg coordinate systems are simply rotated and shifted from the body coordinate system. This transformation,\transframe{\bm{x}^\fbody}{\fbody}{\fleg} is defined by equation \ref{eq:body_to_leg}, further explained in appendix \ref{app:transforms}.
             \begin{equation}\label{eq:body_to_leg}
             \begin{split}
                 \bm{x}^\fleg &= \transframe{\bm{x}^\fbody}{\fbody}{\fleg} \\
@@ -48,12 +35,10 @@
             \end{equation}
 
             \noindent
-            where the \(\fleg\) is the coordinate frame of leg \(i\), \(\bm{Q}_i^\fbody\) is the rotation of said coordinate frame and \(\bm{R}^\fbody_i\) is the root position of
-            said leg coordinate frame in the body coordinate frame. For more detail on this transformation, such as the values of \(\bm{Q}_i^\fbody\) and \(\bm{R}^\fbody_i\), please see
+            where \(\fleg\) is the coordinate frame of leg \(i\), \(\bm{Q}_i^\fbody\) is the rotation of said coordinate frame and \(\bm{R}^\fbody_i\) is the root position of said leg coordinate frame in the body coordinate frame. For more detail on this transformation, such as the values of \(\bm{Q}_i^\fbody\) and \(\bm{R}^\fbody_i\), please see
             appendix \ref{app:transforms}.
 
-            Now that positions can be transformed into the leg coordinate frame the kinematic equations, as described in the following sections, can be applied. The kinematic equations are defined
-            with reference to the variables in the leg frame as shown in figure \ref{fig:kinematics}.
+            Now that positions can be transformed into the leg coordinate frames, the kinematic equations, as described in the following sections, can be applied. The kinematic equations are defined with reference to the variables in the leg frame as shown in figure \ref{fig:kinematics}.
             \begin{figure}[h]
                 \centering
                 % \hspace{-1.38cm}
@@ -64,11 +49,9 @@
 
         \newpage
         \subsection{Inverse Kinematics}
-            The \ac{ik} function calculates the leg servo angles, \(\bm{\Theta} = [\Theta_1, \Theta_2, \Theta_3]^T_{\displaystyle ,}\) required
-            to move the foot to the given target position vector, \(\bm{t} = [x_t,y_t,z_t]^T_{\displaystyle .}\)
-            \hbox{Equation \ref{eq:ik}} describes the \ac{ik} function.
+            The inverse kinematic function calculates the leg servo angles, \(\bm{\Theta}\inrefframe{\fleg} = [\Theta_1, \Theta_2, \Theta_3]^T_{\displaystyle ,}\) required for the foot to be at the given target position vector, \(\bm{t}\inrefframe{\fleg} = [x_t,y_t,z_t]^T_{\displaystyle .}\) The inverse kinematic equations are described by
             \begin{equation}\label{eq:ik}
-                \bm{\Theta}(x_t,y_t,z_t) =
+                \bm{\Theta}\inrefframe{\fleg}(x_t,y_t,z_t) =
                                     % \begin{bmatrix}
                                     %     \Theta_1\\
                                     %     \Theta_2\\
@@ -81,8 +64,7 @@
                                         \dfrac{\pi}{2} - \beta
                                     \end{bmatrix}
             \end{equation}
-            where \(\alpha\), \(\beta\), \(c\) and \(d\) are calculate as shown in equations \ref{eq:alpha} to \ref{eq:dik}. For derivations of these variable
-            please see \ref{app:kinematic}.
+            where \(\alpha\), \(\beta\), \(c\) and \(d\) are calculate as follows:
             \begin{align}
                 \alpha &= \arcsin{\left(\frac{L_3\sin{\beta}}{c}\right)} \label{eq:alpha} \\[0.5cm]
                 \beta &= \arccos{\left(\dfrac{L_1^2 + L_2^2 -c^2}{2L_1L_2}\right)}\\[0.5cm]
@@ -90,10 +72,9 @@
                 d &= \sqrt{x_t^2 + y_t^2} \label{eq:dik}
             \end{align}
         \subsection{Forward Kinematics}
-            The \ac{fk} function calculates the position vector of a foot, \(\bm{p}_f = [x_f,y_f,z_f]^T\),
-            given the current angles of the leg servos, \(\bm{\theta} = [\theta_1, \theta_2, \theta_3]^T\).
+            The forward kinematics function calculates the position vector of a foot, \(\bm{p}_f\inrefframe{\fleg} = [x_f,y_f,z_f]^T\), given the current angles of the leg servos, \(\bm{\theta}\inrefframe{\fleg} = [\theta_1, \theta_2, \theta_3]^T\).
             \begin{align}
-                \bm{p}_f(\theta_1,\theta_2,\theta_3) =
+                \bm{p}_f\inrefframe{\fleg}(\theta_1,\theta_2,\theta_3) =
                                 % \begin{bmatrix}
                                 %     x_c\\
                                 %     y_c\\
@@ -106,7 +87,7 @@
                                     L_2\sin{\theta_2} + L_3\sin{\left(\theta_2 + \theta_3\right)}
                                 \end{bmatrix}
             \end{align}
-            where \(d\) is calculated as shown in in equation \ref{eq:dfk}.
+            where \(d\) is calculated as follows:
             \begin{equation}\label{eq:dfk}
                 d = L1 + L_2\sin{\theta_2} + L_3\sin{(\theta_2 + \theta_3)}
             \end{equation}
@@ -115,7 +96,7 @@
         \subsection{Angular Rate} \label{sec:ang_rate}
             To move a foot on a desired path it is important to not only know the absolute angle of the three leg servos, but also the angular rates of all three
             servos. If the servos are all moved at the same rate, the shape of the path that the foot follows will not be linear, but rather dependant on the
-            current foot position. This is undesirable, thus equations \ref{eq:rate} define the derivative of the \ac{ik} equations (\ref{eq:ik}), i.e. the angular
+            current foot position. This is undesirable, thus equations \ref{eq:rate} defines the derivative of the inverse kinematics equations (\ref{eq:ik}), i.e. the angular
             rate, given the target movement speeds of a foot, \(\dot{x}\), \(\dot{y}\) and \(\dot{z}\).
 
             \begin{equation}\label{eq:rate}
@@ -142,10 +123,7 @@
     
     \newpage
     \section{Walking Gait}
-        To move the hexapod must support its body with some of its legs while the remaining legs swing towards their new targets,
-        at which point the swinging legs become the new supporting. The sequence in which the legs support and swing is called the walking gait.
-        Figure \ref{fig:gait_patterns} shows three different gait patterns that can be used with a hexapod, the wave ripple and tripod gait \citep{Darbha2017AnOS}.
-        The dark cell represents a swinging leg and the light cell a supporting leg.
+        To move, the hexapod must support its body with some of its legs while the remaining legs swing towards their new targets, at which point the swinging legs become the new supporting legs. The sequence in which the legs support and swing is called the walking gait. Figure \ref{fig:gait_patterns} shows three different gait patterns that can be used with a hexapod, namely the wave, ripple, and tripod gaits \citep{Darbha2017AnOS}. A dark cell represents a swinging leg and a light cell a supporting leg.
         \begin{figure}[h]
             \centering
             % \hspace{-1.38cm}
@@ -155,18 +133,15 @@
         \end{figure}
 
         \noindent
-        The wave gait moves one leg at a time while supporting with the remaining 5, the ripple gait moves two legs at a time, and the tripod moves
-        three legs at a time.
+        The wave gait moves one leg at a time while supporting with the remaining 5, the ripple gait moves two legs at a time, and the tripod moves three legs at a time.
 
         The speed of the hexapod is based on the parameters of the gait, specifically as described in equation \ref{eq:speed},
         \begin{equation} \label{eq:speed}
             v = \frac{S}{D\tau}
         \end{equation}
-        where \(S\) is the stride length, \(tau\) is the gait period and \(D\) is the duty factor. \(D\) is defined as the time a leg is in the support phase relative to its swing phase.
-        The wave, ripple and tripod gaits have a duty factor of \(\frac{5}{6}\), \(\frac{2}{3}\) and \(\frac{1}{2}\) respectively.
+        where \(S\) is the stride length, \(\tau\) is the gait period and \(D\) is the duty factor. \(D\) is defined as the time a leg is in the support phase relative to its swing phase. The wave, ripple and tripod gaits have duty factors of \(\frac{5}{6}\), \(\frac{2}{3}\) and \(\frac{1}{2}\) respectively.
         
-        From this it is clear that the wave gait is the slowest while the tripod gait is the fastest, and the ripple gait is in between.
-        It should however be noted the gait's stability is inverse to their speed.
+        From this it is clear that the wave gait is the slowest while the tripod gait is the fastest, and the ripple gait is in-between. It should however be noted the gait's stability is inverse to their speed.
 
         The gait that will be used in this system is the tripod gait, which is the most common gait for hexapods as it supports with three legs, while maximising speed. Even though this is less stable than
         the wave and ripple gaits, it does maintain natural stability with three contact points, which is adequate for most circumstances.
@@ -183,8 +158,7 @@
             \end{figure}
 
             \noindent
-            As can be seen, the swinging legs move in the direction of movement, following a arced path.
-            While the supporting legs move in the opposite direction of movement following a linear path. 
+            As can be seen, the swinging legs move in the direction of movement, following an arced path, while the supporting legs move in the opposite direction of movement following a linear path. 
 
             \newpage
             \noindent
@@ -204,7 +178,7 @@
         
         \newpage
         \subsection{State Machine}
-            The state machine used to realise the tripod gait used in the robot is quite simple, comprised of only two states, stepping and
+            The state machine used to realise the tripod gait used in the robot is quite simple, comprised of only two states, namely stepping and
             resting, as can be seen from figure \ref{fig:gaitSM}. Table \ref{tab:state_defs} defines the actions that should be taken during
             each state.
 
@@ -252,53 +226,49 @@
             \end{table}
 
         \newpage
-        \subsection{Choosing The Supporting And Swinging Legs} \label{sec:supp_swing_calc}
+        \subsection{Choosing the Supporting and Swinging Legs} \label{sec:supp_swing_calc}
             The robot body is divided up into sextants, centered around the nominal leg positions. When calculating
             the swinging legs it is first determined in which sextant the movement direction vector falls, this is called the active sextant.
             The leg related with the active sextant, and the two opposite, are then chosen as swinging, with the remaining three legs chosen as supporting.
-            The states of the legs are encapsulated by the boolean array, \(\bm{S_i}\), defined by equation \ref{eq:is_swing},
-            where a 1 indicates swinging and 0 supporting.
-            \begin{equation}\label{eq:is_swing}
-                \bm{S}_{\bm{i} - \xi}=[i \text{ is even}]
-            \end{equation}
-            where \(\xi \in i\) is the active sextant/leg number, and,
-            \[i = \seq{0}{1}{5}\]
-
+            The states of the legs stored in a boolean array.
+            % \begin{equation}\label{eq:is_swing}
+            %     \bm{S}_{\bm{i} - \xi}=[i \text{ is even}]
+            % \end{equation}
+            % where \(\xi \in i\) is the active sextant/leg number, and,
+            % \[i = \seq{0}{1}{5}\]
             Figure \ref{fig:sextants} illustrates and example with sextant 1 being active. Thus legs 1, 3 and 5 are swinging, while legs 0, 2 and 4 are supporting.
             \begin{figure}[h]
                 \centering
                 \hspace{1.1cm}
                 \includegraphics[clip, trim=0 0.25cm 0 0.25cm]{Diagrams-Sextants.drawio.pdf}
-                \caption{Leg sextants, with sextant 1 being active.} 
+                \caption{Leg sextants, with sextant 1 currently being active.} 
                 \label{fig:sextants}
             \end{figure}
             
             \noindent
-            This of course would not be sufficient to define a walking gait, as at the end of each step \(\bm{S_i}\) does not invert.
-            Thus and additional step after equation \ref{eq:is_swing} is added. The current horizontal length of leg \(\xi\), defined as \(l_\xi\), is compared to its nominal
-            horizontal length, \(L_\xi\). If \(l_\xi\ > L_\xi\), invert \(\bm{S_i}\). As shown in equation \ref{eq:negate_is_swing}.
-            \begin{equation} \label{eq:negate_is_swing}
-                \bm{S}_{\bm{i} - \xi} =
-                                                    \begin{cases}
-                                                        \bm{i} \setminus \bm{S}_{\bm{i} - \xi} & l_\xi > L_\xi \\
-                                                        \bm{S}_{\bm{i} - \xi} & l_\xi \leq L_\xi
-                                                    \end{cases}\\[0.1cm]
-            \end{equation}
+            This of course would not be sufficient to define a walking gait, as at the end of each step the boolean array containing the leg states needs to be inverted. Thus, at the end of each step, if the currently swinging legs are the same as those in the previous step, then the boolean array is inverted.
+            
+            % and additional step after equation \ref{eq:is_swing} is added. The current horizontal length of leg \(\xi\), defined as \(l_\xi\), is compared to its nominal horizontal length, \(L_\xi\). If \(l_\xi\ > L_\xi\), invert \(\bm{S_i}\).
+            % \begin{equation} \label{eq:negate_is_swing}
+            %     \bm{S}_{\bm{i} - \xi} =
+            %                                         \begin{cases}
+            %                                             \bm{i} \setminus \bm{S}_{\bm{i} - \xi} & l_\xi > L_\xi \\
+            %                                             \bm{S}_{\bm{i} - \xi} & l_\xi \leq L_\xi
+            %                                         \end{cases}\\[0.1cm]
+            % \end{equation}
 
-            \newpage
         \subsection{Choosing nominal foot positions}\label{sec:choosing_nominal} 
-            Once the active and inactive legs have been selected it is required to choose nominal targets for all the feet. Sections \ref{sec:support} and \ref{sec:swing}
-            describe the process for finding the support and swinging leg targets; It should be noted that target matrices, denoted by \(\bm{t}\), are common between these two sections, but are computed
-            differently depending on whether the leg is swinging or supporting.
+            Once the active and inactive legs have been selected, it is required to choose nominal targets for all the feet. Sections \ref{sec:support} and \ref{sec:swing}
+            describe the process for finding the support and swinging leg target positions. It should be noted that target matrices, denoted by \(\bm{t}\), are common between these two sections, but are computed differently depending on whether the leg is swinging or supporting.
                 
             \subsubsection{For Supporting Legs} \label{sec:support}
-                The supporting leg nominal targets are chosen with using equations \ref{eq:move_vec} and \ref{eq:opt_supp}, with reference
-                to figure \ref{fig:supp_targ}.
+                The supporting leg nominal targets are chosen by first calculating the move vector \(\boldsymbol{m}^\fbody\), and then adding the move vector to the foot's target position in it's swinging phase, which should be equal to the foot's current position. The move vector is calculated as the vector from the foot's nominal target, from the foot's swinging phase, to the movement direction, \(\bm{w}_\text{dir}^\fbody\), inverted, multiplied by the stride length, and added to the foot's constant resting position, \(\bm{T}^\fbody\). \(\bm{T}^\fbody\) is  a constant that contains the positions of the feet when the robot is standing still, on flat terrain.
+                Equations \ref{eq:move_vec} and \ref{eq:opt_supp} describe this process, with reference to figure \ref{fig:supp_targ}.
                 \begin{figure}[h]
                     \centering
                     % \hspace{1.1cm}
                     \includegraphics[clip, trim=3cm 0.25cm 3.4cm 0.25cm]{Diagrams-ChooseNominalSupp.drawio.pdf}
-                    \caption{Supporting target choosing diagram} 
+                    \caption{Supporting target choosing diagram in the body frame.} 
                     \label{fig:supp_targ}
                 \end{figure}
 
@@ -307,7 +277,7 @@
                 \begin{equation}\label{eq:move_vec}
                     \mdim{\boldsymbol{m}^\fbody}{3}{1} =  (\bm{T}^\fbody - l_\text{str} \bm{\bm{w}_\text{dir}}^\fbody) - \bm{t_\text{nom}}^\fbody
                 \end{equation}
-                where \(\bm{T}^\fbody\) contains the constant rest positions the feet, \(l_\text{str}\) is the desired stride length, \(\bm{w}_\text{dir}^\fbody\)
+                where \(\bm{T}^\fbody\) contains the constant resting positions of the feet, \(l_\text{str}\) is the nominal stride length, \(\bm{w}_\text{dir}^\fbody\)
                 contains the desired walk directions, and \(\bm{t}_\text{nom} ^\fbody\) contains the nominal targets as calculated in
                 equation \ref{eq:swing_nom}.
 
@@ -316,26 +286,27 @@
                     \mdim{\boldsymbol{t}_\text{opt}^\fbody}{3}{6} = \bm{t}_\text{prv}^\fbody + \bm{m}^\fbody
                 \end{equation}
                 where \(\bm{t}_\text{prv}^\fbody\) contains the previous, optimised, targets. Note that equation \ref{eq:opt_supp} does not include the optimisation
-                function \textcolor{red}{XXXX}, this is because the supporting feet will not move relative to the terrain, and thus do not need optimising.
-
+                function, described in chapter \ref{chap:optimisation}. This is because the supporting feet will not move relative to the terrain, and thus do not need their targets optimised.
+            
             \newpage
             \subsubsection{For Swinging Legs} \label{sec:swing}
-                The swinging leg nominal targets are chosen with reference to figure \ref{fig:swinging_targ}.
+                The swinging leg nominal targets are chosen by adding the movement, direction, \(\bm{w}_\text{dir}^\fbody\), multiplied by the stride length, to the constant feet resting positions, \(\bm{T}^\fbody\), and the movement vector of the supporting legs, \(\bm{m} ^\fbody\).
+                
+                A diagram of this process is shown in figure \ref{fig:swinging_targ}. Please note that \(\bm{t}_\text{nom}^{\fmap}\) is in map space, thus \(\bm{t}_\text{nom}^{\fmap}\) is represented as \(\transframe{\bm{t}_\text{nom}^{\fmap}}{\fmap}{\fbody}\) in the figure, because the figure is in body space. This map to body transform is purely for illustrative purposes and is not used in the actual system, as it simply reverses the body to map transform in equation \ref{eq:t_map}.
                 \begin{figure}[h]
                     \centering
                     % \hspace{1.1cm}
-                    \includegraphics[clip, trim=3.25cm 0.25cm 4.9cm 0.3cm]{Diagrams-ChooseNominalSwing.drawio.pdf}
-                    \caption{Swinging target choosing diagram} 
+                    \includegraphics[clip, trim=2.5cm 0.25cm 4.9cm 0.3cm]{Diagrams-ChooseNominalSwing.drawio.pdf}
+                    \caption{Swinging target choosing diagram in the body frame.} 
                     \label{fig:swinging_targ}
                 \end{figure}
 
                 \noindent
-                The nominal targets in map space, \(\bm{t_\text{nom}} ^{\fmap}\), are calculated as in equation \ref{eq:t_map},
+                The swinging nominal targets, in map space, \(\bm{t_\text{nom}} ^{\fmap}\), are calculated as follows,
                 \begin{equation} \label{eq:t_map}
-                    \mdim{\boldsymbol{t}_\text{nom}^{\fmap}}{3}{6} = \transframe{\bm{T}^\fbody + \left(l_\text{str}+|\bm{m}^\fbody|\right)\bm{w}_{dir}^\fbody}{\fbody}{\fmap}
+                    \mdim{\boldsymbol{t}_\text{nom}^{\fmap}}{3}{6} = \transframe{\bm{T}^\fbody + \left(l_\text{str}+\bm{m}^\fbody\right)\bm{w}_{dir}^\fbody}{\fbody}{\fmap}
                 \end{equation}
-                where \(\bm{T}^\fbody\) contains the constant rest positions the feet, \(l_\text{str}\) is the desired stride length, \(\bm{w}_\text{dir}^\fbody\)
-                contains the desired walk directions. \(\avg\bm{m}^\fbody\) is the average move vector 
+                where \(\bm{T}^\fbody\) contains the constant rest positions the feet, \(l_\text{str}\) is the nominal stride length, \(\bm{w}_\text{dir}^\fbody\) contains the desired walk directions. \(\bm{m}^\fbody\) is the average move vector.
 
                 For use in equation \ref{eq:move_vec}, the swinging legs nominal targets, \(\bm{t_\text{nom}} ^\fbody\), are calculated as 
                 in equation \ref{eq:swing_nom},
@@ -343,12 +314,8 @@
                     \mdim{\boldsymbol{t}_\text{nom}^\fbody}{3}{6} = \bm{T}^\fbody + l_{str}\bm{w}_\text{dir}^\fbody
                 \end{equation}
 
-                Note that \(\transframe{\bm{t}_\text{nom}^{\fmap}}{M}{L}\) is quite similar to \(\bm{t}_\text{nom}^\fbody\), the difference is that \(\bm{t}_\text{nom}^{\fmap}\) is set such that it
-                will align with \(\bm{t}_\text{nom}^\fbody\)
-                at the end of the step. Thus, the omission of the average supporting move vector, \(\avg \bm{m}^\fbody\), in calculating \(\bm{t}_\text{nom}^\fbody\)
-                in equation \ref{eq:swing_nom}.
-                Meaning at until the end of the step \(\bm{t}_\text{nom}\inrefframe{M}\) and \(\bm{t}_\text{nom}^\fbody\) will point 
-                to different positions if world space. This is due to needing to account for body movement in world space, but not in local space.
+                \noindent
+                Note that \(\transframe{\bm{t}_\text{nom}^{\fmap}}{\fmap}{\fbody}\) is quite similar to \(\bm{t}_\text{nom}^\fbody\), the difference is that \(\bm{t}_\text{nom}^{\fmap}\) is set such that it will align with \(\bm{t}_\text{nom}^\fbody\) at the end of the step. Explaining the omission of the support phase move vector, \(\bm{m}^\fbody\), in calculating \(\bm{t}_\text{nom}^\fbody\) in equation \ref{eq:swing_nom}. Meaning that until the end of the step, \(\bm{t}_\text{nom}\inrefframe{M}\) and \(\bm{t}_\text{nom}^\fbody\) will point to different positions in world space. This is due to needing to account for body movement in map space, but not in local space.
 
         \newpage
     \section{Trajectory Generation} \label{sec:arc_generation}
@@ -450,12 +417,12 @@
                 \end{equation}
                 where, %\(f_a'(x,y)\) and \(f_b'(x,y)\) are defined as follows:
                 \begin{align} \label{eq:fa}
-                    f_a'(x,y) &= -\left|\frac{v_h}{x}\right| - \left|S(y)\right|\\
+                    f_a'(x,y) &= -\left|\frac{C_h}{x}\right| - \left|S(y)\right|\\
                     f_b'(x,y) &= \frac{y}{x} - f_a(x,y)
                 \end{align}
-                where \(v_h\) is the step height and \(S(y)\) is a sigmoid-like function responsible for the initial vertical rise. \(S(y)\) is defined in defined as
+                where \(C_h\) determines step height and \(S(y)\) is a sigmoid-like function responsible for the initial vertical rise. \(S(y)\) is defined in defined as
                 \begin{equation} \label{eq:sigmoid}
-                    S(y) = \frac{0.515(y-q)}{1+\left|y-q\right|-0.505}
+                    S(y) = \frac{0.515(y-q)}{1+\left|y-q\right|-0.515}
                 \end{equation}
                 where \(q\) is the variable that determines at which vertical displacement the leg path transitions from primarily a vertical motion to an arc motion. Figure \ref{fig:sigmoid_like} illustrates the sigmoid-like function for different values of \(q\).
                 \begin{figure}[h]
@@ -467,11 +434,11 @@
                 \end{figure}
 
                 \noindent
-                Note that the 0.515 and 0.505 values in equation \ref{eq:sigmoid} are set to make its output range from roughly -1 to 0 over the active range.
+                Note that the 0.515 values in equation \ref{eq:sigmoid} are set to make its output range from roughly -1 to 0 over the active range.
                 
                 \newpage
                 \subsubsection{Generated Trajectory Examples}
-                To demonstrate the trajectories generated by the flow function three different example are provided, one with the target on the same vertical level as the starting point, one with the target above the starting point, and one with the target below the starting point. Figures \ref{fig:traj1} to \ref{fig:traj3} show these three examples. Additionally, the parameters \(Ch\) and \(q\) are varied to show their effect. Additionally, please see \hyperlink{}{this video} for a simulated demonstration of the baseline walking system.
+                To demonstrate the trajectories generated by the flow function, three different example are provided: One with the target on the same vertical level as the starting point, one with the target above the starting point, and one with the target below the starting point. Figures \ref{fig:traj1} to \ref{fig:traj3} show these three examples. Additionally, the parameters \(C_h\) and \(q\) are varied to show their effect. Please see \href{https://youtu.be/UfGo_LZfF2c}{this video} for a simulated demonstration of the baseline walking system.
                 \begin{figure}[h]
                     \centering
                     % \hspace{-1.38cm}
@@ -481,7 +448,7 @@
                 \end{figure}
 
                 \noindent
-                As can be seen from figure \ref{fig:traj1} the parameter \(q\) specifies the initial vertical rise above the target position. When \(q\) is zero there is no additional vertical rise, similarly if q were to be made negative, the foot would start moving horizontally before the target's height is reached. While \(q\) does affect the stride height a little bit, the primary stride height parameter is \(Ch\). As can be seen from the figure, adjusting \(Ch\) drastically affects the stride height while leaving vertical rise above the target unaffected.
+                As can be seen from figure \ref{fig:traj1} the parameter \(q\) specifies the initial vertical rise above the target position. When \(q\) is zero there is no additional vertical rise, similarly if q were to be made negative, the foot would start moving horizontally before the target's height is reached. While \(q\) does affect the stride height a little bit, the primary stride height parameter is \(C_h\). As can be seen from the figure, adjusting \(C_h\) drastically affects the stride height while leaving vertical rise above the target unaffected.
 
                 The following example, shown in figure \ref{fig:traj2}, shows the trajectory for when the target is placed above the starting point. Here the initial vertical rise can be seen clearly. Note how increasing \(q\) lengthens the vertical rise. Importantly it can be seen that once the vertical rise is completed, the remaining arc is essentially equivalent to that in figure \ref{fig:traj1}. This is the intended benefit of using a policy such as the flow function.
                 
