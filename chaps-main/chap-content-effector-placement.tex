@@ -112,11 +112,11 @@ This chapter describes the processes necessary for optimising the foot end posit
     \end{figure}
 
     \section{Floor Height Adjustment} \label{sec:height_adjust}
-    After the horizontal position of the feet have been optimised, the height of the foot is simply set to the height of the terrain at the target horizontal coordinates. This ensures that the robots body remains level and at a constant global height.
+    After the horizontal position of the feet have been optimised, the height of the foot is simply set to the height of the terrain at the target horizontal coordinates. This ensures that the robot's body remains level and at a constant global height.
 
-    It is however important to adjust the reference floor height that the robot uses to adapt to a varying average terrain height. If this is not done, then the robot will be incapable of surmounting terrain higher than its commanded standing height, as the robot will simply maintain said height and walk into the tall terrain. There are various methods to choosing a floor height, from using a time of flight sensor underneath the robots main body to using height data from the heightmap.
+    It is however important to adjust the reference floor height that the robot uses to adapt to a varying average terrain height. If this is not done, then the robot will be incapable of surmounting terrain higher than its commanded standing height, as the robot will simply maintain said height and walk into the tall terrain. There are various methods to choosing a floor height, from using a time of flight sensor underneath the robot's main body to using height data from the heightmap.
 
-    The method that was implemented in this project uses the average of the three highest target foot placement positions out of all the robots legs. This allows the robot to pre-emptively increase or decrease its floor height as it targets to step onto higher or lower terrain.
+    The method that was implemented in this project uses the average of the three highest target foot placement positions out of all the robot's legs. This allows the robot to pre-emptively increase or decrease its floor height as it targets to step onto higher or lower terrain.
 
     \captionsetup[figure]{oneside,margin={0cm,0cm}}
     \begin{figure}[h]
