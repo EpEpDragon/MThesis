@@ -1,26 +1,15 @@
 \chapter{Reference Frame Transforms} \label{app:transforms}
-    Reference frame transforms are defined by the shorthand \(\transframe{\bm{x}\inrefframe{A}}{A}{B}\), meaning vector \(\bm{x}\inrefframe{A}\) is transformed
-    from reference frame \refframe{A} to \refframe{B}. Reference frames used are the camera frame, \refframe{\fcamera},
-    the map frame, \refframe{\fmap}, the body frame, \refframe{\fbody}, the leg reference frames, \refframe{\fleg}, and the world frame, \refframe{\fworld}. Transforms used are
-    descried in this appendix.
+    Reference frame transforms are defined by the shorthand \(\transframe{\bm{x}\inrefframe{A}}{A}{B}\), meaning vector \(\bm{x}\inrefframe{A}\) is transformed from reference frame \refframe{A} to \refframe{B}. Reference frames used are the camera frame, \refframe{\fcamera}, the map frame, \refframe{\fmap}, the body frame, \refframe{\fbody}, the leg reference frames, \refframe{\fleg}, and the world frame, \refframe{\fworld}. Transforms used are descried in this appendix.
 
-    \section{Camera to Map}
-        Transforming a vector from camera,\ to map space requires rotating the vector by the camera quaternion, adding
-        te camera's global position to the vector, scaling the vector into the map by multiplying with the map scaling
-        factor, and finally modulating the vector to the confines of the map. As shown in equation \ref{eq:camera_to_map_a}.
+    \section{Camera to World}
+        Transforming a vector from camera to map space requires rotating the vector by the camera quaternion and adding the camera's global position to the vector. As shown in equation \ref{eq:camera_to_map_a}.
         \begin{align} \label{eq:camera_to_map_a}
-        \begin{split}
-            \bm{x}\inrefframe{\fmap} &= \transframe{\bm{x}\inrefframe{\fcamera}}{\fcamera}{\fmap}\\ 
-            &= (\bm{q}_\text{cam} \cdot \bm{x}\inrefframe{\fcamera} \cdot \bm{q}_\text{cam}^{-1}S + \bm{p_\text{rob}}\inrefframe{\fmap}) \mod N
-        \end{split}
+            \begin{split}
+                \bm{p}\inrefframe{\fworld} &= \transframe{\bm{p}\inrefframe{\fcamera}}{\fcamera}{\fworld}\\ 
+                &= \bm{q}_{\fcamera\fworld} \cdot \bm{p}\inrefframe{\fcamera} \cdot \bm{q}_{\fcamera\fworld}{-1} + \bm{p}\inrefframe{\fworld}_{C0}
+            \end{split}
         \end{align}
-        where \(\bm{x}\inrefframe{\fcamera}\) is the vector in camera space, \(\bm{q}_\text{cam}\) is the camera quaternion that rotates \(\bm{x}\inrefframe{\fcamera}\) 
-        into world space, with its \(z\) axis pointing upwards, \(\bm{p_\text{rob}}\inrefframe{\fmap}\) is the coordinate vector of the robot in map space, and \(S\) is the scaling factor
-        used to relate heightmap cells to cm. The relationship between \(N, S\) and \(E\) are characterised by equation \ref{eq:map_scaling}.
-        \begin{equation} \label{eq:map_scaling}
-            N = E \cdot S
-        \end{equation}
-        where \(E\times E\) is the size of the \(N\times N\) heightmap buffer in cm.
+        where \(\boldsymbol{p}\inrefframe{\fworld}\) is the position in the world frame, \(\boldsymbol{q}_{\fcamera\fworld}\) is the quaternion rotation of the world frame relative to the camera frame, and \(\boldsymbol{p}\inrefframe{\fworld}_{C0}\) is the position of the camera frame's origin in the world frame.
     
     \newpage
     \section{World to Map}
@@ -29,24 +18,23 @@
         \begin{align}\label{eq:world_to_map}
         \begin{split}
             \bm{x}\inrefframe{\fmap} &= \transframe{\bm{x}\inrefframe{\fworld}}{\fworld}{\fmap} \\
-            &= \bm{x}\inrefframe{\fworld}S \mod{N}
+            &= \bm{x}\inrefframe{\fworld}\Delta \mod{N}
         \end{split}
         \end{align}
-        where \(S\) is the scaling factor used to relate heightmap cells to cm, and the heightmap buffer is of size \(N\times N\).
+        where \(\Delta\) is the scaling factor used to relate heightmap cells to cm, and the heightmap buffer is of size \(N\times N\).
     \section{Local to Map}
         Local to map space is very similar to equation \ref{eq:world_to_map}, with the exception of using the body quaternion instead of the camera quaterion. This can be seen in
         equation \ref{eq:local_to_map}.
         \begin{equation} \label{eq:local_to_map}
-            \bm{x}\inrefframe{\fmap} = (\bm{q_\text{bod}} \cdot \bm{x}\inrefframe{\fbody} \cdot \bm{q_\text{bod}}^{-1}S + \bm{p_\text{rob}}\inrefframe{\fmap}) \mod N
+            \bm{x}\inrefframe{\fmap} = (\bm{q_\text{bod}} \cdot \bm{x}\inrefframe{\fbody} \cdot \bm{q_\text{bod}}^{-1}\Delta + \bm{p_\text{rob}}\inrefframe{\fmap}) \mod N
         \end{equation}
-        where \(\bm{x}\inrefframe{\fbody}\) is the vector in local space, \(\bm{q}_\text{bod}\) is the robot body's quaternion that rotates \(\bm{x}\inrefframe{\fbody}\) 
-        into map space, with its \(z\) axis pointing upwards, \(\bm{p_\text{rob}}\inrefframe{\fmap}\) is the coordinate vector of the robot in map space, and \(S\) is the scaling factor
+        where \(\bm{x}\inrefframe{\fbody}\) is the vector in local space, \(\bm{q}_\text{bod}\) is the robot body's quaternion that rotates \(\bm{x}\inrefframe{\fbody}\) into map space, with its \(z\) axis pointing upwards, \(\bm{p_\text{rob}}\inrefframe{\fmap}\) is the coordinate vector of the robot in map space, and \(\Delta\) is the scaling factor
         used to relate heightmap cells to cm.
 
     \section{Map to Local}
         Due to the circular nature of the map buffer, translating from map to local space is more challenging. First an intermediate position, \(\bm{x_\text{temp}}\), is defined as a helper,
         \begin{equation} \label{eq:map_to_local_help}
-            \bm{x_\text{temp}} = \bm{p_\text{rob}}\inrefframe{\fmap}\frac{1}{S}
+            \bm{x_\text{temp}} = \bm{p_\text{rob}}\inrefframe{\fmap}\frac{1}{\Delta}
         \end{equation}
         where \(\bm{x_\text{temp}}\) is the map coordinates with the inverse map scaling applied. Now \(\bm{x_\text{temp}}\) must be checked to see if either of its 
         coordinates exceed half the map extents, if so, then it must be adjusted such that both coordinates fall within \(\frac{1}{2}E\).
